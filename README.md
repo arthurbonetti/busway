@@ -1,4 +1,4 @@
-# ABEXIV
+# ABEX - Aprendizado Baseado em Experiência
 Arthur Bonetti
 João Pedro Vogel Costa
 Murilo Schneider
