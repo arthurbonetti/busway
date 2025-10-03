@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test User - Busway</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .btn {
+            background: #0071e3;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 10px;
+            font-size: 16px;
+        }
+        .status {
+            background: #f0f0f0;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Teste de Navegação - Busway</h1>
+    
+    <div class="status" id="sessionStatus">
+        Verificando sessão...
+    </div>
+    
+    <h2>Ações de Teste:</h2>
+    <button class="btn" onclick="createTestUser()">Criar Usuário de Teste</button>
+    <button class="btn" onclick="createTestAdmin()">Criar Admin de Teste</button>
+    <button class="btn" onclick="clearSession()">Limpar Sessão</button>
+    <button class="btn" onclick="goToRoutes()">Ir para Rotas</button>
+    <button class="btn" onclick="goToUserDash()">Dashboard Usuário</button>
+    <button class="btn" onclick="goToAdminDash()">Dashboard Admin</button>
+    
+    <h3>Status das Variáveis:</h3>
+    <div id="debugInfo"></div>
+    
+    <script>
+        function updateStatus() {
+            const session = sessionStorage.getItem('buswaySession');
+            const sessionStatus = document.getElementById('sessionStatus');
+            const debugInfo = document.getElementById('debugInfo');
+            
+            if (session) {
+                const data = JSON.parse(session);
+                sessionStatus.innerHTML = `
+                    <strong>Sessão Ativa:</strong><br>
+                    Nome: ${data.name}<br>
+                    Email: ${data.email}<br>
+                    Admin: ${data.isAdmin ? 'Sim' : 'Não'}
+                `;
+            } else {
+                sessionStatus.textContent = 'Nenhuma sessão ativa';
+            }
+            
+            const users = localStorage.getItem('buswayUsers');
+            const balance = localStorage.getItem('userBalance');
+            const favorites = localStorage.getItem('favoriteRoutes');
+            
+            debugInfo.innerHTML = `
+                <p><strong>SessionStorage buswaySession:</strong> ${session ? 'Existe' : 'Não existe'}</p>
+                <p><strong>LocalStorage buswayUsers:</strong> ${users ? 'Existe' : 'Não existe'}</p>
+                <p><strong>LocalStorage userBalance:</strong> ${balance || 'Não definido'}</p>
+                <p><strong>LocalStorage favoriteRoutes:</strong> ${favorites || 'Não definido'}</p>
+            `;
+        }
+        
+        function createTestUser() {
+            const userData = {
+                id: 'test-user-001',
+                name: 'Usuário Teste',
+                email: 'user@test.com',
+                isAdmin: false,
+                loginTime: new Date().toISOString()
+            };
+            
+            sessionStorage.setItem('buswaySession', JSON.stringify(userData));
+            localStorage.setItem('userBalance', '50.00');
+            alert('Usuário teste criado!');
+            updateStatus();
+        }
+        
+        function createTestAdmin() {
+            const userData = {
+                id: 'test-admin-001',
+                name: 'Admin Teste',
+                email: 'admin@test.com',
+                isAdmin: true,
+                loginTime: new Date().toISOString()
+            };
+            
+            sessionStorage.setItem('buswaySession', JSON.stringify(userData));
+            alert('Admin teste criado!');
+            updateStatus();
+        }
+        
+        function clearSession() {
+            sessionStorage.clear();
+            localStorage.removeItem('userBalance');
+            localStorage.removeItem('favoriteRoutes');
+            alert('Sessão limpa!');
+            updateStatus();
+        }
+        
+        function goToRoutes() {
+            window.location.href = 'routes.html';
+        }
+        
+        function goToUserDash() {
+            window.location.href = 'user-dashboard.html';
+        }
+        
+        function goToAdminDash() {
+            window.location.href = 'dashboard.html';
+        }
+        
+        // Atualizar status na carga da página
+        document.addEventListener('DOMContentLoaded', updateStatus);
+        
+        // Atualizar a cada 2 segundos
+        setInterval(updateStatus, 2000);
+    </script>
+</body>
+</html>

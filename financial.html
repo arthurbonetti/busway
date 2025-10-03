@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Busway - Controle Financeiro</title>
+    <link rel="stylesheet" href="financial.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Navbar -->
+        <nav class="navbar">
+            <div class="nav-content">
+                <div class="nav-left">
+                    <button class="nav-back" onclick="window.history.back()">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M19 12H5M5 12L12 19M5 12L12 5" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                    </button>
+                    <h1 class="page-title">Controle Financeiro</h1>
+                </div>
+                <div class="nav-right">
+                    <button class="btn-export" onclick="financialControl.exportData('csv')">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                            <path d="M12 2v10m0 0l-3-3m3 3l3-3M3 17v2a2 2 0 002 2h14a2 2 0 002-2v-2" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                        Exportar
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Saldo Principal -->
+        <div class="balance-section">
+            <div class="balance-card main-balance">
+                <div class="balance-header">
+                    <h2>Saldo Disponível</h2>
+                    <button class="btn-add-funds" onclick="openAddFundsModal()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                            <path d="M12 5v14m-7-7h14" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                        Adicionar Fundos
+                    </button>
+                </div>
+                <div class="balance-amount">
+                    R$ <span id="mainBalance">0,00</span>
+                </div>
+                <div class="balance-info">
+                    <div class="info-item">
+                        <span class="label">Entradas este mês:</span>
+                        <span class="value income">+R$ <span id="monthlyIncome">0,00</span></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">Saídas este mês:</span>
+                        <span class="value expense">-R$ <span id="monthlyExpense">0,00</span></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cards de Estatísticas -->
+            <div class="stats-cards">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 100 7h5a3.5 3.5 0 110 7H6" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                    </div>
+                    <div class="stat-content">
+                        <h3>Gasto Médio Diário</h3>
+                        <p class="stat-value">R$ <span id="dailyAverage">0,00</span></p>
+                        <p class="stat-change">
+                            <span id="dailyTrend">↓ 5%</span> vs. mês anterior
+                        </p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M9 14l6-6m0 0v4m0-4h-4" stroke="currentColor" stroke-width="2"/>
+                            <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                    </div>
+                    <div class="stat-content">
+                        <h3>Previsão Mensal</h3>
+                        <p class="stat-value">R$ <span id="monthlyPrediction">0,00</span></p>
+                        <p class="stat-suggestion" id="suggestion">Dentro do orçamento</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                    </div>
+                    <div class="stat-content">
+                        <h3>Viagens este Mês</h3>
+                        <p class="stat-value" id="monthlyTrips">0</p>
+                        <p class="stat-info">Economia: R$ <span id="savings">0,00</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filtros e Controles -->
+        <div class="controls-section">
+            <div class="filter-tabs">
+                <button class="tab-btn active" data-period="day">Hoje</button>
+                <button class="tab-btn" data-period="week">Semana</button>
+                <button class="tab-btn" data-period="month">Mês</button>
+                <button class="tab-btn" data-period="year">Ano</button>
+            </div>
+
+            <div class="filter-controls">
+                <select id="categoryFilter" class="filter-select">
+                    <option value="">Todas Categorias</option>
+                    <option value="trip">Passagens</option>
+                    <option value="recharge">Recargas</option>
+                    <option value="refund">Reembolsos</option>
+                    <option value="transfer">Transferências</option>
+                </select>
+
+                <select id="typeFilter" class="filter-select">
+                    <option value="">Todos Tipos</option>
+                    <option value="credit">Entradas</option>
+                    <option value="debit">Saídas</option>
+                </select>
+
+                <button class="btn-search" onclick="applyFilters()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Gráficos -->
+        <div class="charts-section">
+            <div class="chart-container">
+                <h3>Tendência de Gastos</h3>
+                <canvas id="trendChart"></canvas>
+            </div>
+
+            <div class="chart-container">
+                <h3>Gastos por Categoria</h3>
+                <canvas id="expenseChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Lista de Transações -->
+        <div class="transactions-section">
+            <div class="section-header">
+                <h2>Histórico de Transações</h2>
+                <div class="view-options">
+                    <button class="view-btn active" data-view="list">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                            <path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                    </button>
+                    <button class="view-btn" data-view="grid">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                            <rect x="3" y="3" width="7" height="7" stroke="currentColor" stroke-width="2"/>
+                            <rect x="14" y="3" width="7" height="7" stroke="currentColor" stroke-width="2"/>
+                            <rect x="3" y="14" width="7" height="7" stroke="currentColor" stroke-width="2"/>
+                            <rect x="14" y="14" width="7" height="7" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <div id="transactionsList" class="transactions-list">
+                <!-- Transações serão carregadas aqui -->
+            </div>
+
+            <button class="btn-load-more" onclick="loadMoreTransactions()">
+                Carregar Mais
+            </button>
+        </div>
+
+        <!-- Configurações de Recarga Automática -->
+        <div class="auto-recharge-section">
+            <h3>Recarga Automática</h3>
+            <div class="auto-recharge-card">
+                <div class="toggle-container">
+                    <label class="toggle">
+                        <input type="checkbox" id="autoRechargeToggle">
+                        <span class="slider"></span>
+                    </label>
+                    <span>Ativar recarga automática</span>
+                </div>
+                
+                <div class="auto-recharge-settings" id="autoRechargeSettings">
+                    <div class="setting-item">
+                        <label>Recarregar quando saldo for menor que:</label>
+                        <input type="number" id="rechargeThreshold" value="10" min="5" max="50">
+                    </div>
+                    <div class="setting-item">
+                        <label>Valor da recarga:</label>
+                        <input type="number" id="rechargeAmount" value="50" min="20" max="200">
+                    </div>
+                    <div class="setting-item">
+                        <label>Método de pagamento:</label>
+                        <select id="rechargeMethod">
+                            <option value="pix">PIX</option>
+                            <option value="credit">Cartão de Crédito</option>
+                            <option value="debit">Cartão de Débito</option>
+                        </select>
+                    </div>
+                    <button class="btn-save" onclick="saveAutoRecharge()">Salvar Configurações</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Adicionar Fundos -->
+    <div class="modal" id="addFundsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Adicionar Fundos</h2>
+                <button class="modal-close" onclick="closeAddFundsModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="quick-amounts">
+                    <button class="amount-btn" data-amount="20">R$ 20</button>
+                    <button class="amount-btn" data-amount="50">R$ 50</button>
+                    <button class="amount-btn" data-amount="100">R$ 100</button>
+                    <button class="amount-btn" data-amount="200">R$ 200</button>
+                </div>
+                
+                <div class="custom-amount">
+                    <label>Valor personalizado:</label>
+                    <input type="number" id="customAmount" min="5" max="500" placeholder="0,00">
+                </div>
+
+                <div class="payment-methods">
+                    <h4>Método de Pagamento:</h4>
+                    <div class="payment-option">
+                        <input type="radio" name="paymentMethod" id="pix" value="pix" checked>
+                        <label for="pix">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" stroke-width="2"/>
+                            </svg>
+                            PIX
+                        </label>
+                    </div>
+                    <div class="payment-option">
+                        <input type="radio" name="paymentMethod" id="credit" value="credit">
+                        <label for="credit">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                <rect x="2" y="5" width="20" height="14" rx="2" stroke="currentColor" stroke-width="2"/>
+                                <path d="M2 10h20" stroke="currentColor" stroke-width="2"/>
+                            </svg>
+                            Cartão de Crédito
+                        </label>
+                    </div>
+                    <div class="payment-option">
+                        <input type="radio" name="paymentMethod" id="boleto" value="boleto">
+                        <label for="boleto">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                <path d="M3 5h2m0 0h1m-1 0v14m1-14h1m0 0h1m-1 0v14m2-14h1m0 0h1m-1 0v14" stroke="currentColor" stroke-width="2"/>
+                            </svg>
+                            Boleto
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="closeAddFundsModal()">Cancelar</button>
+                <button class="btn-confirm" onclick="confirmAddFunds()">Adicionar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast de Notificação -->
+    <div id="notificationToast" class="notification-toast"></div>
+
+    <script src="financial-control.js"></script>
+    <script src="financial-ui.js"></script>
+</body>
+</html>

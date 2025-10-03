@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl:*)",
+      "Bash(tar:*)",
+      "Bash(./bin/elasticsearch:*)",
+      "Bash(./bin/kibana:*)",
+      "Bash(open:*)",
+      "Bash(./elasticsearch-8.15.0/bin/elasticsearch-create-enrollment-token:*)",
+      "Bash(mkdir:*)",
+      "Bash(rm:*)",
+      "Bash(find:*)",
+      "Bash(true)",
+      "Bash(grep:*)",
+      "Bash(git init:*)",
+      "Bash(git add:*)"
+    ],
+    "deny": []
+  }
+}
