@@ -70,8 +70,37 @@ document.addEventListener('DOMContentLoaded', () => {
         loadTransactions();
         setupNotifications();
         checkForActiveRoute();
+        initTheme();
     }
 });
+
+// Aplicar tema
+function applyTheme(theme) {
+    if (theme === 'dark') {
+        document.body.classList.add('dark-theme');
+    } else if (theme === 'auto') {
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (prefersDark) {
+            document.body.classList.add('dark-theme');
+        } else {
+            document.body.classList.remove('dark-theme');
+        }
+    } else {
+        document.body.classList.remove('dark-theme');
+    }
+}
+
+function initTheme() {
+    const preferences = JSON.parse(localStorage.getItem('userPreferences') || '{}');
+    const theme = preferences.theme || 'light';
+    applyTheme(theme);
+    
+    if (theme === 'auto') {
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+            applyTheme('auto');
+        });
+    }
+}
 
 function loadUserSession() {
     const sessionData = sessionStorage.getItem('buswaySession');
@@ -184,7 +213,7 @@ function displayRoutes(routes) {
                     <div class="route-number">${route.number}</div>
                     <div class="route-name">${route.name}</div>
                 </div>
-                <button class="btn-favorite ${favoriteRoutes.includes(route.id) ? 'active' : ''}" onclick="toggleFavorite('${route.id}')">
+                <button class="btn-favorite ${favoriteRoutes.some(r => (typeof r === 'object' ? r.id : r) === route.id) ? 'active' : ''}" onclick="toggleFavorite('${route.id}')">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
                     </svg>
@@ -229,7 +258,7 @@ function filterRoutes(filter) {
             // Todos têm o mesmo preço neste exemplo
             break;
         case 'favorites':
-            filteredRoutes = mockRoutes.filter(r => favoriteRoutes.includes(r.id));
+            filteredRoutes = mockRoutes.filter(r => favoriteRoutes.some(fav => (typeof fav === 'object' ? fav.id : fav) === r.id));
             break;
     }
     
@@ -237,12 +266,36 @@ function filterRoutes(filter) {
 }
 
 function toggleFavorite(routeId) {
-    const index = favoriteRoutes.indexOf(routeId);
+    // Verificar se é array de objetos ou IDs
+    const isObjectArray = favoriteRoutes.length > 0 && typeof favoriteRoutes[0] === 'object';
+    
+    let index = -1;
+    if (isObjectArray) {
+        index = favoriteRoutes.findIndex(r => r.id === routeId || r.routeId === routeId);
+    } else {
+        index = favoriteRoutes.indexOf(routeId);
+    }
+    
     if (index > -1) {
         favoriteRoutes.splice(index, 1);
         showToast('Rota removida dos favoritos', 'info');
     } else {
-        favoriteRoutes.push(routeId);
+        const route = mockRoutes.find(r => r.id === routeId);
+        if (route) {
+            // Adicionar como objeto com metadados
+            favoriteRoutes.push({
+                id: route.id,
+                routeId: route.id,
+                number: route.number,
+                name: route.name,
+                origin: route.origin,
+                destination: route.destination,
+                addedAt: new Date().toISOString()
+            });
+        } else {
+            // Fallback: adicionar apenas ID
+            favoriteRoutes.push(routeId);
+        }
         showToast('Rota adicionada aos favoritos', 'success');
     }
     
@@ -293,6 +346,26 @@ function selectRoute(routeId) {
         setTimeout(() => {
             addNotification(`Ônibus ${route.number} chegando em 2 minutos!`, 'transport');
         }, 3000);
+        
+        // Registrar viagem em recentTrips
+        const originInput = document.getElementById('origin')?.value || 'Terminal Central';
+        const destinationInput = document.getElementById('destination')?.value || route.destination;
+        const recentTrips = JSON.parse(localStorage.getItem('recentTrips') || '[]');
+        recentTrips.unshift({
+            routeId: route.id,
+            routeNumber: route.number,
+            routeName: route.name,
+            origin: originInput,
+            destination: destinationInput,
+            price: 4.50,
+            timestamp: new Date().toISOString(),
+            date: new Date().toISOString()
+        });
+        // Manter apenas as últimas 50 viagens
+        if (recentTrips.length > 50) {
+            recentTrips.pop();
+        }
+        localStorage.setItem('recentTrips', JSON.stringify(recentTrips));
     } else {
         showToast('Saldo insuficiente! Adicione créditos ao seu cartão.', 'error');
         openAddCreditModal();

@@ -49,23 +49,12 @@
             <div class="feature-card">
                 <div class="feature-icon">
                     <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
-                        <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z" fill="#0071e3"/>
-                    </svg>
-                </div>
-                <h3>Notificações</h3>
-                <p>Configure alertas personalizados</p>
-                <button class="feature-btn">Configurar</button>
-            </div>
-
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
                         <path d="M3 13h2v8H3v-8zm4-6h2v14H7V7zm4-6h2v20h-2V1zm4 4h2v16h-2V5zm4 5h2v11h-2V10z" fill="#0071e3"/>
                     </svg>
                 </div>
                 <h3>Histórico</h3>
                 <p>Veja suas viagens anteriores</p>
-                <button class="feature-btn">Ver Histórico</button>
+                <button class="feature-btn" onclick="window.location.href='history.html'">Ver Histórico</button>
             </div>
 
             <div class="feature-card">
@@ -76,7 +65,7 @@
                 </div>
                 <h3>Configurações</h3>
                 <p>Ajuste suas preferências</p>
-                <button class="feature-btn">Configurar</button>
+                <button class="feature-btn" onclick="window.location.href='settings.html'">Configurar</button>
             </div>
 
             <div class="feature-card">
@@ -102,7 +91,7 @@
                 <div class="wallet-info">
                     <div class="balance-amount">R$ <span id="currentBalance">0,00</span></div>
                     <p class="balance-label">Saldo disponível</p>
-                    <button class="add-funds-btn" onclick="window.location.href='routes.html#financial'">
+                    <button class="add-funds-btn" onclick="window.location.href='financial.html'">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                             <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor"/>
                         </svg>
@@ -114,43 +103,8 @@
 
         <div class="recent-section">
             <h2>Atividades Recentes</h2>
-            <div class="recent-list">
-                <div class="recent-item">
-                    <div class="recent-icon">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                            <path d="M4 16c0 .88.39 1.67 1 2.22V20a1 1 0 001 1h1a1 1 0 001-1v-1h8v1a1 1 0 001 1h1a1 1 0 001-1v-1.78c.61-.55 1-1.34 1-2.22V6c0-3.5-3.58-4-8-4s-8 .5-8 4v10zm3.5 1c-.83 0-1.5-.67-1.5-1.5S6.67 14 7.5 14s1.5.67 1.5 1.5S8.33 17 7.5 17zm9 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm1.5-6H6V6h12v5z" fill="#0071e3"/>
-                        </svg>
-                    </div>
-                    <div class="recent-info">
-                        <h4>Última viagem</h4>
-                        <p>Centro → Shopping - Linha 45</p>
-                        <span class="recent-time">Hoje, 14:30</span>
-                    </div>
-                </div>
-                <div class="recent-item">
-                    <div class="recent-icon">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                            <path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z" fill="#0071e3"/>
-                        </svg>
-                    </div>
-                    <div class="recent-info">
-                        <h4>Pagamento processado</h4>
-                        <p>R$ 4,50 - Cartão de crédito</p>
-                        <span class="recent-time">Ontem, 18:45</span>
-                    </div>
-                </div>
-                <div class="recent-item">
-                    <div class="recent-icon">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                            <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z" fill="#0071e3"/>
-                        </svg>
-                    </div>
-                    <div class="recent-info">
-                        <h4>Alerta configurado</h4>
-                        <p>Notificação para Linha 32</p>
-                        <span class="recent-time">2 dias atrás</span>
-                    </div>
-                </div>
+            <div class="recent-list" id="recentActivitiesList">
+                <!-- Atividades serão carregadas dinamicamente -->
             </div>
         </div>
     </main>

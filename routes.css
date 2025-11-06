@@ -11,6 +11,13 @@ body {
     color: #333;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    transition: background 0.3s ease;
+}
+
+/* Tema Escuro */
+body.dark-theme {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    color: #e2e8f0;
 }
 
 /* Estilos para sugestões de autocomplete */
@@ -28,6 +35,13 @@ body {
     z-index: 1000;
     max-height: 250px;
     overflow-y: auto;
+    transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+body.dark-theme .suggestions-dropdown {
+    background: rgba(30, 41, 59, 0.95);
+    border: 1px solid rgba(51, 65, 85, 0.5);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .suggestion-item {
@@ -47,6 +61,10 @@ body {
     background: #f8f9fa;
 }
 
+body.dark-theme .suggestion-item:hover {
+    background: rgba(51, 65, 85, 0.5);
+}
+
 .suggestion-icon {
     margin-right: 12px;
     display: flex;
@@ -61,12 +79,22 @@ body {
     font-weight: 500;
     color: #333;
     font-size: 14px;
+    transition: color 0.3s ease;
+}
+
+body.dark-theme .suggestion-name {
+    color: #e2e8f0;
 }
 
 .suggestion-type {
     font-size: 12px;
     color: #888;
     margin-top: 2px;
+    transition: color 0.3s ease;
+}
+
+body.dark-theme .suggestion-type {
+    color: #94a3b8;
 }
 
 /* Estilos para destinos populares */
@@ -79,6 +107,11 @@ body {
     font-weight: 600;
     color: #333;
     margin-bottom: 16px;
+    transition: color 0.3s ease;
+}
+
+body.dark-theme .popular-destinations h3 {
+    color: #e2e8f0;
 }
 
 .popular-grid {
@@ -97,10 +130,19 @@ body {
     text-align: center;
 }
 
+body.dark-theme .popular-item {
+    background: rgba(30, 41, 59, 0.9);
+    border: 1px solid rgba(51, 65, 85, 0.5);
+}
+
 .popular-item:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     border-color: #667eea;
+}
+
+body.dark-theme .popular-item:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .popular-icon {
@@ -114,11 +156,21 @@ body {
     font-size: 14px;
     color: #333;
     margin-bottom: 4px;
+    transition: color 0.3s ease;
+}
+
+body.dark-theme .popular-name {
+    color: #e2e8f0;
 }
 
 .popular-type {
     font-size: 12px;
     color: #888;
+    transition: color 0.3s ease;
+}
+
+body.dark-theme .popular-type {
+    color: #94a3b8;
 }
 
 .app-container {
@@ -133,6 +185,12 @@ body {
     padding: 15px 20px;
     margin-bottom: 20px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+
+body.dark-theme .navbar {
+    background: rgba(30, 41, 59, 0.95);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
 }
 
 .nav-content {
@@ -176,6 +234,11 @@ body {
     font-size: 24px;
     font-weight: bold;
     color: #0071e3;
+    transition: color 0.3s ease;
+}
+
+body.dark-theme .logo {
+    color: #667eea;
 }
 
 .nav-right {
@@ -233,6 +296,16 @@ body {
     overflow-y: auto;
     z-index: 1000;
     padding: 20px;
+    transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+
+body.dark-theme .notifications-dropdown {
+    background: rgba(30, 41, 59, 0.95);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-theme .notifications-dropdown h3 {
+    color: #e2e8f0;
 }
 
 .notifications-list {
@@ -248,12 +321,24 @@ body {
     transition: background 0.3s;
 }
 
+body.dark-theme .notification-item {
+    background: rgba(15, 23, 42, 0.5);
+}
+
 .notification-item:hover {
     background: #e5e5e5;
 }
 
+body.dark-theme .notification-item:hover {
+    background: rgba(51, 65, 85, 0.5);
+}
+
 .notification-item.unread {
     background: #e6f3ff;
+}
+
+body.dark-theme .notification-item.unread {
+    background: rgba(102, 126, 234, 0.2);
 }
 
 .notification-time {
@@ -273,11 +358,21 @@ body {
     border-radius: 20px;
     padding: 30px;
     min-height: 600px;
+    transition: background 0.3s ease;
+}
+
+body.dark-theme .main-content {
+    background: rgba(30, 41, 59, 0.9);
 }
 
 .route-selection-container h2 {
     margin-bottom: 25px;
     color: #333;
+    transition: color 0.3s ease;
+}
+
+body.dark-theme .route-selection-container h2 {
+    color: #e2e8f0;
 }
 
 .search-section {
@@ -285,6 +380,11 @@ body {
     padding: 25px;
     border-radius: 15px;
     margin-bottom: 25px;
+    transition: background 0.3s ease;
+}
+
+body.dark-theme .search-section {
+    background: rgba(15, 23, 42, 0.5);
 }
 
 .input-group {
@@ -296,6 +396,11 @@ body {
     margin-bottom: 8px;
     color: #666;
     font-size: 14px;
+    transition: color 0.3s ease;
+}
+
+body.dark-theme .input-group label {
+    color: #94a3b8;
 }
 
 .location-input {
@@ -307,6 +412,12 @@ body {
     padding: 12px 15px;
     gap: 10px;
     position: relative;
+    transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+body.dark-theme .location-input {
+    background: rgba(30, 41, 59, 0.8);
+    border: 2px solid rgba(51, 65, 85, 0.5);
 }
 
 .location-input input {
@@ -314,6 +425,17 @@ body {
     border: none;
     outline: none;
     font-size: 16px;
+    color: #333;
+    background: transparent;
+    transition: color 0.3s ease;
+}
+
+body.dark-theme .location-input input {
+    color: #e2e8f0;
+}
+
+body.dark-theme .location-input input::placeholder {
+    color: #64748b;
 }
 
 .swap-locations {
@@ -399,6 +521,11 @@ body {
     text-align: center;
     padding: 40px;
     color: #999;
+    transition: color 0.3s ease;
+}
+
+body.dark-theme .empty-state {
+    color: #94a3b8;
 }
 
 .empty-state svg {
@@ -416,14 +543,28 @@ body {
     position: relative;
 }
 
+body.dark-theme .route-card {
+    background: rgba(30, 41, 59, 0.9);
+    border: 2px solid rgba(51, 65, 85, 0.5);
+}
+
 .route-card:hover {
     border-color: #0071e3;
     transform: translateX(5px);
 }
 
+body.dark-theme .route-card:hover {
+    border-color: #667eea;
+}
+
 .route-card.selected {
     border-color: #0071e3;
     background: #e6f3ff;
+}
+
+body.dark-theme .route-card.selected {
+    border-color: #667eea;
+    background: rgba(102, 126, 234, 0.2);
 }
 
 .route-header {
@@ -437,11 +578,21 @@ body {
     font-size: 24px;
     font-weight: bold;
     color: #0071e3;
+    transition: color 0.3s ease;
+}
+
+body.dark-theme .route-number {
+    color: #667eea;
 }
 
 .route-name {
     color: #666;
     margin-top: 5px;
+    transition: color 0.3s ease;
+}
+
+body.dark-theme .route-name {
+    color: #94a3b8;
 }
 
 .btn-favorite {
@@ -478,6 +629,15 @@ body {
     font-size: 16px;
     font-weight: 600;
     color: #333;
+    transition: color 0.3s ease;
+}
+
+body.dark-theme .info-value {
+    color: #e2e8f0;
+}
+
+body.dark-theme .info-label {
+    color: #94a3b8;
 }
 
 .route-actions {
@@ -558,6 +718,12 @@ body {
     padding: 20px;
     margin-top: 20px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+
+body.dark-theme .tracking-section {
+    background: rgba(30, 41, 59, 0.9);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
 }
 
 .tracking-header {
@@ -618,6 +784,11 @@ body {
     border-radius: 15px;
     padding: 25px;
     margin-top: 25px;
+    transition: background 0.3s ease;
+}
+
+body.dark-theme .financial-section {
+    background: rgba(15, 23, 42, 0.5);
 }
 
 .balance-card {
@@ -717,10 +888,21 @@ body {
     border-radius: 15px;
     width: 90%;
     max-width: 400px;
+    transition: background 0.3s ease;
+}
+
+body.dark-theme .modal-content {
+    background: rgba(30, 41, 59, 0.95);
 }
 
 .modal-content h3 {
     margin-bottom: 20px;
+    color: #333;
+    transition: color 0.3s ease;
+}
+
+body.dark-theme .modal-content h3 {
+    color: #e2e8f0;
 }
 
 .payment-methods {
@@ -1028,6 +1210,11 @@ body {
     color: #1a1a1a;
     font-size: 20px;
     font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+body.dark-theme .popular-destinations h3 {
+    color: #e2e8f0;
 }
 
 .popular-grid {
@@ -1049,9 +1236,19 @@ body {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
+body.dark-theme .popular-item {
+    background: rgba(30, 41, 59, 0.9);
+    border: 1px solid rgba(51, 65, 85, 0.5);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
 .popular-item:hover {
     transform: translateY(-4px);
     box-shadow: 0 12px 25px rgba(0, 0, 0, 0.1);
+}
+
+body.dark-theme .popular-item:hover {
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.5);
 }
 
 .popular-icon {
@@ -1070,11 +1267,21 @@ body {
     font-weight: 600;
     color: #1a1a1a;
     margin-bottom: 4px;
+    transition: color 0.3s ease;
+}
+
+body.dark-theme .popular-name {
+    color: #e2e8f0;
 }
 
 .popular-type {
     font-size: 12px;
     color: #64748b;
+    transition: color 0.3s ease;
+}
+
+body.dark-theme .popular-type {
+    color: #94a3b8;
 }
 
 /* Estilos para rastreamentos ativos */
@@ -1083,6 +1290,11 @@ body {
     border-radius: 12px;
     padding: 16px;
     margin-bottom: 20px;
+    transition: background 0.3s ease;
+}
+
+body.dark-theme .active-trackings {
+    background: rgba(15, 23, 42, 0.5);
 }
 
 .active-trackings h4 {
@@ -1090,6 +1302,11 @@ body {
     color: #333;
     font-size: 16px;
     font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+body.dark-theme .active-trackings h4 {
+    color: #e2e8f0;
 }
 
 .active-routes-list {
@@ -1109,9 +1326,19 @@ body {
     border: 1px solid #e2e8f0;
 }
 
+body.dark-theme .active-route-item {
+    background: rgba(30, 41, 59, 0.8);
+    border: 1px solid rgba(51, 65, 85, 0.5);
+}
+
 .active-route-item:hover {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     border-color: #cbd5e1;
+}
+
+body.dark-theme .active-route-item:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    border-color: rgba(102, 126, 234, 0.5);
 }
 
 .route-indicator {
@@ -1140,6 +1367,11 @@ body {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    transition: color 0.3s ease;
+}
+
+body.dark-theme .route-name {
+    color: #e2e8f0;
 }
 
 .route-status {
@@ -1148,6 +1380,11 @@ body {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    transition: color 0.3s ease;
+}
+
+body.dark-theme .route-status {
+    color: #94a3b8;
 }
 
 .route-actions {

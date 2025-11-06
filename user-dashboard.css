@@ -10,6 +10,13 @@ body {
     min-height: 100vh;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    transition: background 0.3s ease;
+}
+
+/* Tema Escuro */
+body.dark-theme {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    color: #e2e8f0;
 }
 
 .header {
@@ -21,6 +28,12 @@ body {
     position: sticky;
     top: 0;
     z-index: 100;
+    transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+body.dark-theme .header {
+    background: rgba(15, 23, 42, 0.95);
+    border-bottom: 1px solid rgba(51, 65, 85, 0.5);
 }
 
 .header-container {
@@ -52,6 +65,11 @@ body {
     font-weight: 600;
     color: #1a1a1a;
     font-size: 16px;
+    transition: color 0.3s ease;
+}
+
+body.dark-theme #userName {
+    color: #e2e8f0;
 }
 
 .logout-btn {
@@ -73,6 +91,17 @@ body {
     transform: translateY(-1px);
 }
 
+body.dark-theme .logout-btn {
+    border-color: rgba(51, 65, 85, 0.5);
+    color: #94a3b8;
+}
+
+body.dark-theme .logout-btn:hover {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+    border-color: rgba(239, 68, 68, 0.3);
+}
+
 .main-content {
     max-width: 1200px;
     margin: 0 auto;
@@ -88,6 +117,13 @@ body {
     margin-bottom: 40px;
     border: 1px solid rgba(255, 255, 255, 0.2);
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+    transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+body.dark-theme .welcome-section {
+    background: rgba(30, 41, 59, 0.9);
+    border: 1px solid rgba(51, 65, 85, 0.5);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
 }
 
 .welcome-section h2 {
@@ -96,6 +132,11 @@ body {
     font-size: 32px;
     font-weight: 700;
     letter-spacing: -0.8px;
+    transition: color 0.3s ease;
+}
+
+body.dark-theme .welcome-section h2 {
+    color: #e2e8f0;
 }
 
 #welcomeMessage {
@@ -103,6 +144,11 @@ body {
     font-size: 18px;
     font-weight: 400;
     line-height: 1.6;
+    transition: color 0.3s ease;
+}
+
+body.dark-theme #welcomeMessage {
+    color: #94a3b8;
 }
 
 .features-grid {
@@ -124,9 +170,19 @@ body {
     cursor: pointer;
 }
 
+body.dark-theme .feature-card {
+    background: rgba(30, 41, 59, 0.9);
+    border: 1px solid rgba(51, 65, 85, 0.5);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
 .feature-card:hover {
     transform: translateY(-4px);
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+body.dark-theme .feature-card:hover {
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
 }
 
 .feature-icon {
@@ -146,6 +202,11 @@ body {
     color: #1a1a1a;
     margin-bottom: 8px;
     letter-spacing: -0.3px;
+    transition: color 0.3s ease;
+}
+
+body.dark-theme .feature-card h3 {
+    color: #e2e8f0;
 }
 
 .feature-card p {
@@ -153,6 +214,11 @@ body {
     font-size: 15px;
     line-height: 1.5;
     margin-bottom: 24px;
+    transition: color 0.3s ease;
+}
+
+body.dark-theme .feature-card p {
+    color: #94a3b8;
 }
 
 .feature-btn {
@@ -184,6 +250,11 @@ body {
     font-size: 24px;
     font-weight: 600;
     letter-spacing: -0.5px;
+    transition: color 0.3s ease;
+}
+
+body.dark-theme .wallet-section h2 {
+    color: #e2e8f0;
 }
 
 .wallet-card {
@@ -253,6 +324,11 @@ body {
     font-size: 24px;
     font-weight: 600;
     letter-spacing: -0.5px;
+    transition: color 0.3s ease;
+}
+
+body.dark-theme .recent-section h2 {
+    color: #e2e8f0;
 }
 
 .recent-list {
@@ -263,6 +339,13 @@ body {
     overflow: hidden;
     border: 1px solid rgba(255, 255, 255, 0.2);
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+    transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+body.dark-theme .recent-list {
+    background: rgba(30, 41, 59, 0.9);
+    border: 1px solid rgba(51, 65, 85, 0.5);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
 }
 
 .recent-item {
@@ -274,12 +357,20 @@ body {
     transition: all 0.2s;
 }
 
+body.dark-theme .recent-item {
+    border-bottom: 1px solid rgba(51, 65, 85, 0.5);
+}
+
 .recent-item:last-child {
     border-bottom: none;
 }
 
 .recent-item:hover {
     background: rgba(102, 126, 234, 0.05);
+}
+
+body.dark-theme .recent-item:hover {
+    background: rgba(102, 126, 234, 0.15);
 }
 
 .recent-icon {
@@ -300,6 +391,11 @@ body {
     font-weight: 600;
     margin-bottom: 4px;
     letter-spacing: -0.2px;
+    transition: color 0.3s ease;
+}
+
+body.dark-theme .recent-info h4 {
+    color: #e2e8f0;
 }
 
 .recent-info p {
@@ -307,12 +403,22 @@ body {
     font-size: 14px;
     margin-bottom: 4px;
     line-height: 1.4;
+    transition: color 0.3s ease;
+}
+
+body.dark-theme .recent-info p {
+    color: #94a3b8;
 }
 
 .recent-time {
     color: #94a3b8;
     font-size: 12px;
     font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+body.dark-theme .recent-time {
+    color: #64748b;
 }
 
 .notification {

@@ -227,6 +227,44 @@ const realRoutes = [
         ]
     },
     {
+        id: '402',
+        number: '402',
+        name: 'Hospital Regional - UFFS',
+        origin: 'Hospital Regional',
+        destination: 'UFFS',
+        originCoords: [-27.0895, -52.6125],
+        destinationCoords: [-27.1084, -52.6392],
+        price: 'R$ 4,50',
+        baseDistance: 4.5,
+        baseDuration: 15,
+        stops: [
+            { name: 'Hospital Regional', coords: [-27.0895, -52.6125] },
+            { name: 'São Cristóvão', coords: [-27.0845, -52.6085] },
+            { name: 'Centro da Cidade', coords: [-27.0965, -52.6150] },
+            { name: 'Av. Fernando Machado', coords: [-27.1055, -52.6360] },
+            { name: 'UFFS', coords: [-27.1084, -52.6392] }
+        ]
+    },
+    {
+        id: '403',
+        number: '403',
+        name: 'UFFS - Hospital Regional',
+        origin: 'UFFS',
+        destination: 'Hospital Regional',
+        originCoords: [-27.1084, -52.6392],
+        destinationCoords: [-27.0895, -52.6125],
+        price: 'R$ 4,50',
+        baseDistance: 4.5,
+        baseDuration: 15,
+        stops: [
+            { name: 'UFFS', coords: [-27.1084, -52.6392] },
+            { name: 'Av. Fernando Machado', coords: [-27.1055, -52.6360] },
+            { name: 'Centro da Cidade', coords: [-27.0965, -52.6150] },
+            { name: 'São Cristóvão', coords: [-27.0845, -52.6085] },
+            { name: 'Hospital Regional', coords: [-27.0895, -52.6125] }
+        ]
+    },
+    {
         id: '501',
         number: '501',
         name: 'Expresso Aeroporto',
@@ -1653,7 +1691,7 @@ function displayRoutes(routes) {
                     <div class="route-number">${route.number}</div>
                     <div class="route-name">${route.name}</div>
                 </div>
-                <button class="btn-favorite ${favoriteRoutes.includes(route.id) ? 'active' : ''}" onclick="toggleFavorite('${route.id}')">
+                <button class="btn-favorite ${favoriteRoutes.some(r => (typeof r === 'object' ? r.id : r) === route.id) ? 'active' : ''}" onclick="toggleFavorite('${route.id}')">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
                     </svg>
@@ -1716,12 +1754,36 @@ function swapLocations() {
 }
 
 function toggleFavorite(routeId) {
-    const index = favoriteRoutes.indexOf(routeId);
+    // Verificar se é array de objetos ou IDs
+    const isObjectArray = favoriteRoutes.length > 0 && typeof favoriteRoutes[0] === 'object';
+    
+    let index = -1;
+    if (isObjectArray) {
+        index = favoriteRoutes.findIndex(r => r.id === routeId || r.routeId === routeId);
+    } else {
+        index = favoriteRoutes.indexOf(routeId);
+    }
+    
     if (index > -1) {
         favoriteRoutes.splice(index, 1);
         showToast('Rota removida dos favoritos', 'info');
     } else {
-        favoriteRoutes.push(routeId);
+        const route = realRoutes.find(r => r.id === routeId);
+        if (route) {
+            // Adicionar como objeto com metadados
+            favoriteRoutes.push({
+                id: route.id,
+                routeId: route.id,
+                number: route.number,
+                name: route.name,
+                origin: route.origin,
+                destination: route.destination,
+                addedAt: new Date().toISOString()
+            });
+        } else {
+            // Fallback: adicionar apenas ID
+            favoriteRoutes.push(routeId);
+        }
         showToast('Rota adicionada aos favoritos', 'success');
     }
     
@@ -1798,6 +1860,26 @@ function selectRoute(routeId) {
         setTimeout(() => {
             addNotification(`Viagem iniciada na linha ${route.number}. Tenha uma boa viagem!`, 'transport');
         }, 5000);
+        
+        // Registrar viagem em recentTrips
+        const originInput = document.getElementById('origin')?.value || 'Local atual';
+        const destinationInput = document.getElementById('destination')?.value || route.destination;
+        const recentTrips = JSON.parse(localStorage.getItem('recentTrips') || '[]');
+        recentTrips.unshift({
+            routeId: route.id,
+            routeNumber: route.number,
+            routeName: route.name,
+            origin: originInput,
+            destination: destinationInput,
+            price: routePrice,
+            timestamp: new Date().toISOString(),
+            date: new Date().toISOString()
+        });
+        // Manter apenas as últimas 50 viagens
+        if (recentTrips.length > 50) {
+            recentTrips.pop();
+        }
+        localStorage.setItem('recentTrips', JSON.stringify(recentTrips));
         
     } else {
         showToast('Saldo insuficiente! Adicione créditos ao seu cartão.', 'error');

@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configurações - Busway</title>
+    <link rel="stylesheet" href="settings.css">
+</head>
+<body>
+    <header class="header">
+        <div class="header-container">
+            <div class="header-left">
+                <button class="back-btn" onclick="window.location.href='user-dashboard.html'">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+                <h1 class="logo">Busway</h1>
+            </div>
+            <div class="user-info">
+                <span id="userName">Usuário</span>
+                <button id="logoutBtn" class="logout-btn">Sair</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="settings-container">
+            <h2 class="settings-title">Configurações</h2>
+
+            <!-- Configurações de Notificações -->
+            <section class="settings-section">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z" fill="#667eea"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="section-title">Notificações</h3>
+                        <p class="section-description">Configure quais notificações você deseja receber</p>
+                    </div>
+                </div>
+
+                <div class="settings-options">
+                    <div class="option-item">
+                        <div class="option-info">
+                            <h4>Notificações do Sistema</h4>
+                            <p>Receber notificações gerais do aplicativo</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="notifSystem" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="option-item">
+                        <div class="option-info">
+                            <h4>Notificações de Transporte</h4>
+                            <p>Alertas sobre chegada de ônibus e rotas</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="notifTransport" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="option-item">
+                        <div class="option-info">
+                            <h4>Notificações Financeiras</h4>
+                            <p>Alertas sobre pagamentos e transações</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="notifFinancial" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="option-item">
+                        <div class="option-info">
+                            <h4>Notificações de Promoções</h4>
+                            <p>Ofertas especiais e descontos</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="notifPromotions">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="option-item">
+                        <div class="option-info">
+                            <h4>Notificações de Rotas Favoritas</h4>
+                            <p>Alertas sobre rotas que você favoritou</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="notifFavoriteRoutes" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="option-item">
+                        <div class="option-info">
+                            <h4>Notificações do Navegador</h4>
+                            <p>Permitir notificações do sistema operacional</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="notifBrowser">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Configurações de Conta -->
+            <section class="settings-section">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" fill="#667eea"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="section-title">Conta</h3>
+                        <p class="section-description">Gerencie suas informações de conta</p>
+                    </div>
+                </div>
+
+                <div class="settings-options">
+                    <div class="option-item">
+                        <div class="option-info">
+                            <h4>Email</h4>
+                            <p id="userEmail">carregando...</p>
+                        </div>
+                    </div>
+
+                    <div class="option-item clickable" id="changePasswordBtn">
+                        <div class="option-info">
+                            <h4>Alterar Senha</h4>
+                            <p>Atualize sua senha de acesso</p>
+                        </div>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                            <path d="M9 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Configurações de Preferências -->
+            <section class="settings-section">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z" fill="#667eea"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="section-title">Preferências</h3>
+                        <p class="section-description">Personalize sua experiência</p>
+                    </div>
+                </div>
+
+                <div class="settings-options">
+                    <div class="option-item">
+                        <div class="option-info">
+                            <h4>Tema</h4>
+                            <p>Escolha entre tema claro ou escuro</p>
+                        </div>
+                        <select id="themeSelect" class="select-input">
+                            <option value="light">Claro</option>
+                            <option value="dark">Escuro</option>
+                            <option value="auto">Automático</option>
+                        </select>
+                    </div>
+
+                    <div class="option-item">
+                        <div class="option-info">
+                            <h4>Idioma</h4>
+                            <p>Selecione o idioma do aplicativo</p>
+                        </div>
+                        <select id="languageSelect" class="select-input">
+                            <option value="pt-BR">Português (Brasil)</option>
+                            <option value="en">English</option>
+                            <option value="es">Español</option>
+                        </select>
+                    </div>
+
+                    <div class="option-item">
+                        <div class="option-info">
+                            <h4>Recarga Automática</h4>
+                            <p>Ative recarga automática quando o saldo estiver baixo</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="autoRecharge">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="option-item" id="autoRechargeConfig" style="display: none;">
+                        <div class="option-info">
+                            <h4>Valor Mínimo para Recarga</h4>
+                            <p>Defina quando a recarga automática será ativada</p>
+                        </div>
+                        <input type="number" id="rechargeThreshold" class="number-input" min="5" max="100" value="10" step="5">
+                        <span class="input-suffix">R$</span>
+                    </div>
+
+                    <div class="option-item" id="autoRechargeAmount" style="display: none;">
+                        <div class="option-info">
+                            <h4>Valor da Recarga Automática</h4>
+                            <p>Quanto será recarregado automaticamente</p>
+                        </div>
+                        <input type="number" id="rechargeAmount" class="number-input" min="10" max="500" value="50" step="10">
+                        <span class="input-suffix">R$</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Configurações de Privacidade -->
+            <section class="settings-section">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" fill="#667eea"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="section-title">Privacidade</h3>
+                        <p class="section-description">Controle seus dados e privacidade</p>
+                    </div>
+                </div>
+
+                <div class="settings-options">
+                    <div class="option-item">
+                        <div class="option-info">
+                            <h4>Compartilhar Localização</h4>
+                            <p>Permitir que o app use sua localização</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="shareLocation" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="option-item">
+                        <div class="option-info">
+                            <h4>Analytics e Dados de Uso</h4>
+                            <p>Compartilhar dados anônimos para melhorias</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="shareAnalytics">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Botão Salvar -->
+            <div class="save-section">
+                <button class="save-btn" id="saveSettingsBtn">Salvar Configurações</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal de Alterar Senha -->
+    <div id="passwordModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Alterar Senha</h3>
+                <button class="modal-close" id="closePasswordModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="currentPassword">Senha Atual</label>
+                    <input type="password" id="currentPassword" placeholder="Digite sua senha atual">
+                </div>
+                <div class="form-group">
+                    <label for="newPassword">Nova Senha</label>
+                    <input type="password" id="newPassword" placeholder="Digite a nova senha (mín. 6 caracteres)">
+                </div>
+                <div class="form-group">
+                    <label for="confirmPassword">Confirmar Nova Senha</label>
+                    <input type="password" id="confirmPassword" placeholder="Confirme a nova senha">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" id="cancelPasswordBtn">Cancelar</button>
+                <button class="btn-primary" id="submitPasswordBtn">Alterar Senha</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="notification" id="notification"></div>
+
+    <script src="settings.js"></script>
+</body>
+</html>
+
