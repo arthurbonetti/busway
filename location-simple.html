@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rastreamento | Busway</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="location-simple.css?v=3.0" />
+    <link rel="stylesheet" href="dark-mode.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Navbar -->
+        <nav class="navbar">
+            <div class="nav-left">
+                <button class="nav-home" onclick="window.location.href='user-dashboard.html'" title="Início">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                    </svg>
+                </button>
+                <h1 class="page-title">Rastreamento</h1>
+            </div>
+            <button class="btn-cancel" onclick="cancelTrip()">
+                Cancelar
+            </button>
+        </nav>
+
+        <!-- Map -->
+        <div class="map-container">
+            <div id="map"></div>
+
+            <!-- Info Card -->
+            <div class="info-card">
+                <div class="trip-header">
+                    <div class="route-badge" id="routeBadge">N/A</div>
+                    <div class="route-name" id="routeName">Carregando...</div>
+                </div>
+
+                <!-- Clean list with icons (Uber-style) -->
+                <div class="info-list">
+                    <!-- Status -->
+                    <div class="info-row" id="statusRow">
+                        <div class="info-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a">
+                                <circle cx="12" cy="12" r="10" stroke-width="2"/>
+                                <path d="M12 6v6l4 2" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                        </div>
+                        <div class="info-content">
+                            <div class="info-text" id="tripStatus">Aguardando ônibus...</div>
+                        </div>
+                    </div>
+
+                    <!-- ETA -->
+                    <div class="info-row">
+                        <div class="info-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a">
+                                <path d="M12 2v20M2 12h20" stroke-width="2" stroke-linecap="round"/>
+                                <circle cx="12" cy="12" r="3" fill="#1a1a1a"/>
+                            </svg>
+                        </div>
+                        <div class="info-content">
+                            <div class="info-text" id="etaValue">Calculando...</div>
+                        </div>
+                    </div>
+
+                    <!-- Bus Distance -->
+                    <div class="info-row">
+                        <div class="info-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a">
+                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" stroke-width="2"/>
+                                <circle cx="12" cy="10" r="3" stroke-width="2"/>
+                            </svg>
+                        </div>
+                        <div class="info-content">
+                            <div class="info-text" id="busDistance">---</div>
+                        </div>
+                    </div>
+
+                    <!-- Duration -->
+                    <div class="info-row">
+                        <div class="info-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a">
+                                <circle cx="12" cy="12" r="10" stroke-width="2"/>
+                                <polyline points="12 6 12 12 16 14" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                        </div>
+                        <div class="info-content">
+                            <div class="info-text"><span id="totalDuration">---</span> de viagem</div>
+                        </div>
+                    </div>
+
+                    <!-- Route -->
+                    <div class="info-row">
+                        <div class="info-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a">
+                                <circle cx="5" cy="5" r="3" stroke-width="2"/>
+                                <circle cx="19" cy="19" r="3" stroke-width="2"/>
+                                <line x1="7" y1="7" x2="17" y2="17" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                        </div>
+                        <div class="info-content">
+                            <div class="info-text">
+                                <span id="routeOrigin">---</span> → <span id="routeDestination">---</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Driver -->
+                    <div class="info-row">
+                        <div class="info-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a">
+                                <circle cx="12" cy="8" r="4" stroke-width="2"/>
+                                <path d="M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                        </div>
+                        <div class="info-content">
+                            <div class="info-text">Motorista: <span id="driverName">---</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Price with warning -->
+                <div class="price-section">
+                    <div class="price-value" id="tripPrice">R$ 0,00</div>
+                    <div class="price-note" id="priceNote">Será debitado quando o ônibus chegar</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="firestore-service.js"></script>
+    <script src="dark-mode-global.js"></script>
+    <script src="bus-simulator.js"></script>
+    <script src="location-simple.js"></script>
+</body>
+</html>

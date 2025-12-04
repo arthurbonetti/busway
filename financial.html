@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Busway - Controle Financeiro</title>
+    <link rel="stylesheet" href="financial.css">
+    <link rel="stylesheet" href="dark-mode.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Navbar -->
+        <nav class="navbar">
+            <div class="nav-content">
+                <div class="nav-left">
+                    <button class="nav-back" onclick="window.location.href='user-dashboard.html'" title="Início">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                        </svg>
+                    </button>
+                    <h1 class="page-title">Controle Financeiro</h1>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Saldo Principal -->
+        <div class="balance-section">
+            <div class="balance-card main-balance">
+                <div class="balance-header">
+                    <h2>Saldo Disponível</h2>
+                    <button class="btn-add-funds" onclick="openAddFundsModal()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                            <path d="M12 5v14m-7-7h14" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                        Adicionar Fundos
+                    </button>
+                </div>
+                <div class="balance-amount">
+                    R$ <span id="mainBalance">0,00</span>
+                </div>
+                <div class="balance-info">
+                    <div class="info-item">
+                        <span class="label">Entradas este mês:</span>
+                        <span class="value income">+R$ <span id="monthlyIncome">0,00</span></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">Saídas este mês:</span>
+                        <span class="value expense">-R$ <span id="monthlyExpense">0,00</span></span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Lista de Transações -->
+        <div class="transactions-section">
+            <div class="section-header">
+                <h2>Histórico de Transações</h2>
+            </div>
+
+            <div id="transactionsList" class="transactions-list">
+                <!-- Transações serão carregadas aqui -->
+            </div>
+
+            <button class="btn-load-more" onclick="loadMoreTransactions()">
+                Carregar Mais
+            </button>
+        </div>
+
+    </div>
+
+    <!-- Modal Adicionar Fundos -->
+    <div class="modal" id="addFundsModal" style="display: none;">
+        <div class="modal-overlay" onclick="closeAddFundsModal()"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Adicionar Fundos</h3>
+                <button class="btn-close" onclick="closeAddFundsModal()">×</button>
+            </div>
+
+            <div class="modal-body">
+                <div class="input-group">
+                    <label>Valor (R$)</label>
+                    <input type="number" id="fundAmount" min="5" step="5" placeholder="0,00">
+                </div>
+
+                <div class="payment-methods">
+                    <h4>Método de Pagamento</h4>
+                    <div class="payment-options">
+                        <label class="payment-option">
+                            <input type="radio" name="paymentMethod" value="pix" checked>
+                            <div class="payment-card">
+                                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M7 7L12 2L17 7M7 17L12 22L17 17M17 7L22 12L17 17M7 17L2 12L7 7M12 12L17 7M12 12L7 17M12 12L17 17M12 12L7 7" stroke="#32BCAD" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                <span>PIX</span>
+                            </div>
+                        </label>
+
+                        <label class="payment-option">
+                            <input type="radio" name="paymentMethod" value="card">
+                            <div class="payment-card">
+                                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="2" y="5" width="20" height="14" rx="2" stroke="#667eea" stroke-width="2"/>
+                                    <path d="M2 10H22" stroke="#667eea" stroke-width="2"/>
+                                    <line x1="6" y1="14" x2="10" y2="14" stroke="#667eea" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                                <span>Cartão</span>
+                            </div>
+                        </label>
+
+                        <label class="payment-option">
+                            <input type="radio" name="paymentMethod" value="boleto">
+                            <div class="payment-card">
+                                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="4" y="6" width="16" height="12" rx="1" stroke="#FF6B35" stroke-width="2"/>
+                                    <line x1="7" y1="10" x2="7" y2="14" stroke="#FF6B35" stroke-width="2.5"/>
+                                    <line x1="10" y1="10" x2="10" y2="14" stroke="#FF6B35" stroke-width="1.5"/>
+                                    <line x1="12" y1="10" x2="12" y2="14" stroke="#FF6B35" stroke-width="2.5"/>
+                                    <line x1="14" y1="10" x2="14" y2="14" stroke="#FF6B35" stroke-width="1.5"/>
+                                    <line x1="17" y1="10" x2="17" y2="14" stroke="#FF6B35" stroke-width="2"/>
+                                </svg>
+                                <span>Boleto</span>
+                            </div>
+                        </label>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeAddFundsModal()">Cancelar</button>
+                <button class="btn-primary" onclick="processFundAddition()">Adicionar R$ <span id="displayAmount">0,00</span></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast de Notificação -->
+    <div id="notificationToast" class="notification-toast"></div>
+
+    <!-- Firebase v8 SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+    <!-- Configuração e serviços -->
+    <script src="firebase-config.js"></script>
+    <script src="firestore-service.js"></script>
+    <script src="dark-mode-global.js"></script>
+    <script src="financial-control.js"></script>
+    <script src="financial-ui.js"></script>
+</body>
+</html>

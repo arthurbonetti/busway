@@ -1,0 +1,349 @@
+/* LOCATION.CSS - Estilos para página de rastreamento */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background: #f5f5f7;
+    color: #1d1d1f;
+}
+
+.app-container {
+    max-width: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Navbar */
+.navbar {
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.nav-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nav-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.nav-back {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    color: #0071e3;
+    transition: opacity 0.2s;
+}
+
+.nav-back:hover {
+    opacity: 0.7;
+}
+
+.page-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.btn-cancel {
+    background: #ff3b30;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.btn-cancel:hover {
+    background: #e6352a;
+    transform: translateY(-1px);
+}
+
+/* Mapa */
+.map-container {
+    width: 100%;
+    height: 50vh;
+    min-height: 300px;
+    z-index: 1;
+}
+
+/* Card de Informações */
+.info-card {
+    background: white;
+    border-radius: 20px 20px 0 0;
+    margin-top: -20px;
+    padding: 1.5rem;
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+    position: relative;
+    z-index: 10;
+    flex: 1;
+    overflow-y: auto;
+}
+
+.trip-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.route-badge {
+    background: #0071e3;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 1.25rem;
+}
+
+.route-name {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #1d1d1f;
+}
+
+/* Status */
+.trip-status {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+}
+
+.status-icon {
+    font-size: 2rem;
+}
+
+.status-text {
+    color: white;
+    font-weight: 600;
+    font-size: 1.125rem;
+}
+
+/* ETA */
+.eta-section {
+    background: #f5f5f7;
+    padding: 1.25rem;
+    border-radius: 12px;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.eta-label {
+    color: #86868b;
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+.eta-value {
+    color: #0071e3;
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+/* Distância */
+.distance-section,
+.next-stop-section {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: white;
+    border: 1px solid #e5e5e7;
+    border-radius: 12px;
+    margin-bottom: 0.75rem;
+}
+
+.distance-icon,
+.next-stop-icon {
+    font-size: 1.5rem;
+}
+
+.distance-info,
+.next-stop-info {
+    flex: 1;
+}
+
+.distance-label,
+.next-stop-label {
+    color: #86868b;
+    font-size: 0.875rem;
+    margin-bottom: 0.25rem;
+}
+
+.distance-value,
+.next-stop-name {
+    color: #1d1d1f;
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+/* Detalhes do trajeto */
+.journey-details {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e5e5e7;
+}
+
+.journey-details h3 {
+    font-size: 1.125rem;
+    margin-bottom: 1rem;
+    color: #1d1d1f;
+}
+
+.journey-step {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem;
+    border-left: 3px solid #e5e5e7;
+    margin-bottom: 0.75rem;
+    transition: all 0.3s;
+}
+
+.journey-step.active {
+    border-left-color: #0071e3;
+    background: #f0f4ff;
+    border-radius: 8px;
+}
+
+.step-icon {
+    font-size: 1.5rem;
+}
+
+.step-info {
+    flex: 1;
+}
+
+.step-title {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    color: #1d1d1f;
+}
+
+.step-details {
+    color: #86868b;
+    font-size: 0.875rem;
+    margin-bottom: 0.25rem;
+}
+
+.step-duration {
+    color: #0071e3;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+/* Preço */
+.price-section {
+    margin-top: 1.5rem;
+    padding: 1.25rem;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    border-radius: 12px;
+    text-align: center;
+}
+
+.price-label {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+}
+
+.price-value {
+    color: white;
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.price-note {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.75rem;
+}
+
+/* Notificação */
+.notification {
+    position: fixed;
+    bottom: -100px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1d1d1f;
+    color: white;
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transition: bottom 0.3s ease;
+    z-index: 1000;
+    max-width: 90%;
+    text-align: center;
+}
+
+.notification.show {
+    bottom: 2rem;
+}
+
+.notification.success {
+    background: #10b981;
+}
+
+.notification.error {
+    background: #ef4444;
+}
+
+.notification.info {
+    background: #0071e3;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .nav-content {
+        padding: 0.75rem 1rem;
+    }
+
+    .page-title {
+        font-size: 1.125rem;
+    }
+
+    .btn-cancel {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.875rem;
+    }
+
+    .map-container {
+        height: 40vh;
+    }
+
+    .info-card {
+        padding: 1rem;
+    }
+
+    .eta-value {
+        font-size: 1.5rem;
+    }
+
+    .price-value {
+        font-size: 1.5rem;
+    }
+}
