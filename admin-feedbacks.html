@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feedbacks | Admin Busway</title>
+    <link rel="stylesheet" href="admin-feedbacks.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="nav-content">
+            <button class="nav-back" onclick="window.location.href='admin-dashboard.html'" title="Voltar">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                </svg>
+            </button>
+            <h1 class="page-title">Feedbacks dos Usuários</h1>
+        </div>
+        <div class="nav-actions">
+            <select class="filter-select" id="filterStatus">
+                <option value="all">Todos</option>
+                <option value="unread" selected>Não Lidos</option>
+                <option value="read">Lidos</option>
+            </select>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">TOTAL</div>
+                <div class="stat-value" id="totalFeedbacks">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">NÃO LIDOS</div>
+                <div class="stat-value" id="unreadFeedbacks">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">LIDOS</div>
+                <div class="stat-value" id="readFeedbacks">0</div>
+            </div>
+        </div>
+
+        <!-- Feedbacks List -->
+        <div class="feedbacks-container" id="feedbacksContainer">
+            <!-- Feedbacks carregados dinamicamente -->
+        </div>
+
+        <!-- Empty State -->
+        <div class="empty-state" id="emptyState" style="display: none;">
+            <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
+            </svg>
+            <h3>Nenhum feedback encontrado</h3>
+            <p>Os feedbacks dos usuários aparecerão aqui</p>
+        </div>
+    </main>
+
+    <div class="notification" id="notification"></div>
+
+    <!-- Firebase v8 SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+    <!-- App Scripts -->
+    <script src="firebase-config.js"></script>
+    <script src="firestore-service.js"></script>
+    <script src="admin-feedbacks.js"></script>
+</body>
+</html>

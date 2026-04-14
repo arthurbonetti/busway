@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Histórico | Busway</title>
+    <link rel="stylesheet" href="history.css?v=2.0">
+    <link rel="stylesheet" href="dark-mode.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="nav-content">
+            <button class="nav-back" onclick="window.location.href='user-dashboard.html'" title="Voltar">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                </svg>
+            </button>
+            <h1 class="page-title">Histórico</h1>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">TOTAL DE VIAGENS</div>
+                <div class="stat-value" id="totalTrips">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">TOTAL GASTO</div>
+                <div class="stat-value" id="totalSpent">R$ 0</div>
+            </div>
+        </div>
+
+        <!-- Trips List Section -->
+        <div class="trips-section">
+            <h2 class="section-title">Suas viagens</h2>
+            <div class="trips-list" id="tripsList">
+                <!-- Trips will be loaded here dynamically -->
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div class="empty-state" id="emptyState" style="display: none;">
+            <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+            </svg>
+            <h3>Nenhuma viagem ainda</h3>
+            <p>Suas viagens aparecerão aqui</p>
+            <button class="btn-primary" onclick="window.location.href='routes-simple.html'">Buscar Rotas</button>
+        </div>
+    </main>
+
+    <div class="notification" id="notification"></div>
+
+    <!-- Firebase v8 SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+    <!-- App Scripts -->
+    <script src="firebase-config.js"></script>
+    <script src="firestore-service.js"></script>
+    <script src="dark-mode-global.js"></script>
+    <script src="history.js?v=2.0"></script>
+</body>
+</html>
+

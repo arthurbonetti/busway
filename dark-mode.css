@@ -1,0 +1,167 @@
+/* DARK MODE GLOBAL CSS */
+/* Este arquivo deve ser incluído em todas as páginas */
+
+body {
+    transition: background 0.3s ease, color 0.3s ease;
+}
+
+/* Dark Theme - Base */
+body.dark-theme {
+    background: #1a1a1a !important;
+    color: #e6e6e6 !important;
+}
+
+/* Navbar */
+body.dark-theme .navbar,
+body.dark-theme .header {
+    background: #2a2a2a !important;
+    border-bottom-color: #3a3a3a !important;
+}
+
+body.dark-theme .page-title,
+body.dark-theme .header-title {
+    color: #e6e6e6 !important;
+}
+
+/* Cards */
+body.dark-theme .stat-card,
+body.dark-theme .card,
+body.dark-theme .trip-card,
+body.dark-theme .route-card,
+body.dark-theme .setting-card,
+body.dark-theme .feedback-card {
+    background: #2a2a2a !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3) !important;
+}
+
+body.dark-theme .stat-card:hover,
+body.dark-theme .card:hover,
+body.dark-theme .trip-card:hover,
+body.dark-theme .route-card:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4) !important;
+}
+
+/* Text */
+body.dark-theme .stat-value,
+body.dark-theme .section-title,
+body.dark-theme .trip-locations,
+body.dark-theme .trip-price,
+body.dark-theme h1, body.dark-theme h2, body.dark-theme h3,
+body.dark-theme .route-name,
+body.dark-theme .setting-label {
+    color: #e6e6e6 !important;
+}
+
+body.dark-theme .trip-date,
+body.dark-theme .setting-description,
+body.dark-theme .empty-state p {
+    color: #999 !important;
+}
+
+/* Borders */
+body.dark-theme .trip-footer,
+body.dark-theme .setting-card,
+body.dark-theme .route-card {
+    border-color: #3a3a3a !important;
+}
+
+/* Inputs */
+body.dark-theme .form-input,
+body.dark-theme input[type="text"],
+body.dark-theme input[type="email"],
+body.dark-theme input[type="number"],
+body.dark-theme textarea,
+body.dark-theme select {
+    background: #333 !important;
+    border-color: #444 !important;
+    color: #e6e6e6 !important;
+}
+
+body.dark-theme .form-input::placeholder,
+body.dark-theme input::placeholder,
+body.dark-theme textarea::placeholder {
+    color: #666 !important;
+}
+
+/* Buttons */
+body.dark-theme .btn-header {
+    background: #333 !important;
+    border-color: #444 !important;
+    color: #e6e6e6 !important;
+}
+
+body.dark-theme .btn-header:hover {
+    background: #3a3a3a !important;
+}
+
+/* Tables */
+body.dark-theme .users-table-container,
+body.dark-theme .users-table th,
+body.dark-theme .users-table td {
+    background: #2a2a2a !important;
+    border-color: #3a3a3a !important;
+    color: #e6e6e6 !important;
+}
+
+body.dark-theme .users-table tr:hover {
+    background: #333 !important;
+}
+
+/* Modal */
+body.dark-theme .modal {
+    background: #2a2a2a !important;
+}
+
+body.dark-theme .modal-title {
+    color: #e6e6e6 !important;
+}
+
+body.dark-theme .modal-form-input {
+    background: #333 !important;
+    border-color: #444 !important;
+    color: #e6e6e6 !important;
+}
+
+body.dark-theme .modal-btn-cancel {
+    background: #333 !important;
+    color: #e6e6e6 !important;
+}
+
+body.dark-theme .modal-btn-cancel:hover {
+    background: #3a3a3a !important;
+}
+
+/* Sidebar */
+body.dark-theme .routes-sidebar {
+    background: #2a2a2a !important;
+    border-right-color: #3a3a3a !important;
+}
+
+body.dark-theme .sidebar-section {
+    border-bottom-color: #3a3a3a !important;
+}
+
+/* Map instructions */
+body.dark-theme .map-instructions {
+    background: #2a2a2a !important;
+    color: #e6e6e6 !important;
+}
+
+/* Empty state */
+body.dark-theme .empty-state h3 {
+    color: #e6e6e6 !important;
+}
+
+/* Balance card */
+body.dark-theme .balance-value {
+    color: #e6e6e6 !important;
+}
+
+/* Quick actions */
+body.dark-theme .quick-action {
+    background: #2a2a2a !important;
+}
+
+body.dark-theme .quick-action-label {
+    color: #e6e6e6 !important;
+}

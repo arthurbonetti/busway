@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Busway</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="dark-mode.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif;
+            background: #f5f7fa;
+            color: #1a202c;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1a202c;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-header {
+            padding: 8px 16px;
+            background: #f7fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            color: #4a5568;
+        }
+
+        .btn-header:hover {
+            background: #edf2f7;
+        }
+
+        /* Navigation Tabs */
+        .nav-tabs {
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 0 24px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .nav-tab {
+            padding: 16px 24px;
+            background: none;
+            border: none;
+            border-bottom: 2px solid transparent;
+            font-size: 14px;
+            font-weight: 500;
+            color: #718096;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .nav-tab:hover {
+            color: #4a5568;
+        }
+
+        .nav-tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        /* Tab Content */
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* ROTAS TAB - Two Column Layout */
+        .routes-container {
+            display: grid;
+            grid-template-columns: 420px 1fr;
+            height: calc(100vh - 121px);
+        }
+
+        .routes-sidebar {
+            background: white;
+            border-right: 1px solid #e2e8f0;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-section {
+            padding: 16px 24px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .sidebar-section.form-section {
+            max-height: 50vh;
+            overflow-y: auto;
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #718096;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: #4a5568;
+            margin-bottom: 6px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-input:read-only {
+            background: #f7fafc;
+            color: #718096;
+        }
+
+        .metrics-preview {
+            display: none;
+            background: #f7fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 16px;
+        }
+
+        .metrics-preview.show {
+            display: block;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .metric-item {
+            text-align: center;
+        }
+
+        .metric-label {
+            font-size: 12px;
+            color: #718096;
+            margin-bottom: 4px;
+        }
+
+        .metric-value {
+            font-size: 20px;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:disabled {
+            background: #cbd5e0;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            width: 100%;
+            padding: 10px;
+            background: white;
+            color: #4a5568;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+
+        .btn-secondary:hover {
+            background: #f7fafc;
+        }
+
+        .map-container {
+            position: relative;
+            height: 100%;
+        }
+
+        #routesMap {
+            width: 100%;
+            height: 100%;
+        }
+
+        .map-instructions {
+            position: absolute;
+            top: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            z-index: 1000;
+            font-size: 13px;
+            color: #4a5568;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .routes-list {
+            padding: 20px 24px;
+            flex: 1;
+            overflow-y: auto;
+            min-height: 300px;
+        }
+
+        .route-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+            transition: all 0.2s;
+        }
+
+        .route-card:hover {
+            border-color: #cbd5e0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .route-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .route-number {
+            background: #ef4444;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .route-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-icon {
+            padding: 6px 10px;
+            background: #f7fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+
+        .btn-icon:hover {
+            background: #edf2f7;
+        }
+
+        .btn-icon.danger {
+            color: #e53e3e;
+        }
+
+        .btn-icon.danger:hover {
+            background: #fff5f5;
+            border-color: #feb2b2;
+        }
+
+        .route-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 8px;
+        }
+
+        .route-path {
+            font-size: 13px;
+            color: #718096;
+            margin-bottom: 8px;
+        }
+
+        .route-metrics {
+            display: flex;
+            gap: 16px;
+            font-size: 12px;
+            color: #4a5568;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 48px 24px;
+            color: #a0aec0;
+        }
+
+        /* USUÁRIOS TAB */
+        .users-container {
+            padding: 24px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .users-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .users-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: #718096;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .users-table-container {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .users-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .users-table th {
+            background: #f7fafc;
+            padding: 12px 16px;
+            text-align: left;
+            font-size: 13px;
+            font-weight: 600;
+            color: #4a5568;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .users-table td {
+            padding: 12px 16px;
+            font-size: 14px;
+            color: #2d3748;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .users-table tr:hover {
+            background: #f7fafc;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .badge.admin {
+            background: #fed7d7;
+            color: #c53030;
+        }
+
+        .badge.user {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 16px 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: none;
+            z-index: 2000;
+            min-width: 300px;
+        }
+
+        .toast.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(400px); }
+            to { transform: translateX(0); }
+        }
+
+        .toast.success {
+            border-left: 4px solid #48bb78;
+        }
+
+        .toast.error {
+            border-left: 4px solid #f56565;
+        }
+
+        .toast.info {
+            border-left: 4px solid #4299e1;
+        }
+
+        /* Modal de Edição de Usuário */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            padding: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 24px;
+        }
+
+        .modal-form-group {
+            margin-bottom: 16px;
+        }
+
+        .modal-form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: #4a5568;
+            margin-bottom: 6px;
+        }
+
+        .modal-form-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .modal-form-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .modal-btn-cancel {
+            background: #f7fafc;
+            color: #4a5568;
+        }
+
+        .modal-btn-cancel:hover {
+            background: #edf2f7;
+        }
+
+        .modal-btn-save {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .modal-btn-save:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <button onclick="window.location.href='user-dashboard.html'" style="background: transparent; border: none; color: #667eea; cursor: pointer; padding: 6px; display: flex; align-items: center; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Início">
+                <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                </svg>
+            </button>
+            <h1 class="header-title">Painel de administração - Busway</h1>
+        </div>
+        <div class="header-actions">
+            <a href="user-dashboard.html" class="btn-header">← Voltar</a>
+            <button class="btn-header" onclick="logout()">Sair</button>
+        </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="nav-tabs">
+        <button class="nav-tab active" onclick="switchTab('routes')">Rotas</button>
+        <button class="nav-tab" onclick="switchTab('users')">Usuários</button>
+        <button class="nav-tab" onclick="window.location.href='admin-feedbacks.html'">Feedbacks</button>
+    </div>
+
+    <!-- TAB: ROTAS -->
+    <div id="routesTab" class="tab-content active">
+        <div class="routes-container">
+            <!-- Sidebar -->
+            <div class="routes-sidebar">
+                <!-- Formulário -->
+                <div class="sidebar-section form-section">
+                    <div class="section-title">Nova Rota</div>
+
+                    <form id="routeForm">
+                        <div class="form-group">
+                            <label class="form-label">Número da Linha *</label>
+                            <input type="text" class="form-input" id="routeNumber" placeholder="Ex: 101" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Nome da Rota *</label>
+                            <input type="text" class="form-input" id="routeName" placeholder="Ex: Centro - Efapi" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Origem (clique no mapa)</label>
+                            <input type="text" class="form-input" id="routeOrigin" placeholder="Aguardando seleção..." readonly>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Destino (clique no mapa)</label>
+                            <input type="text" class="form-input" id="routeDestination" placeholder="Aguardando seleção..." readonly>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Preço (R$) *</label>
+                            <input type="number" class="form-input" id="routePrice" step="0.01" min="0" value="4.80" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Frequência</label>
+                            <input type="text" class="form-input" id="routeFrequency" placeholder="Ex: 10-15 min" value="10-15 min">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Motorista *</label>
+                            <input type="text" class="form-input" id="routeDriver" placeholder="Ex: João Silva" required>
+                        </div>
+
+                        <!-- Métricas Preview -->
+                        <div class="metrics-preview" id="metricsPreview">
+                            <div class="metric-label" style="text-align:center;margin-bottom:12px;font-weight:600;">Cálculo Automático (OSRM)</div>
+                            <div class="metrics-grid">
+                                <div class="metric-item">
+                                    <div class="metric-label">Distância</div>
+                                    <div class="metric-value" id="previewDistance">-</div>
+                                </div>
+                                <div class="metric-item">
+                                    <div class="metric-label">Tempo</div>
+                                    <div class="metric-value" id="previewDuration">-</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-primary" id="btnSave" disabled>Salvar Rota</button>
+                        <button type="button" class="btn-secondary" onclick="resetRouteForm()">Limpar</button>
+                    </form>
+                </div>
+
+                <!-- Lista de Rotas -->
+                <div class="routes-list">
+                    <div class="section-title">Rotas Cadastradas</div>
+                    <div id="routesList">
+                        <div class="empty-state">
+                            Nenhuma rota cadastrada
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mapa -->
+            <div class="map-container">
+                <div class="map-instructions" id="mapInstructions">
+                    <svg style="display:inline-block;width:18px;height:18px;vertical-align:middle;margin-right:6px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    </svg>
+                    Clique no mapa para marcar <strong>origem</strong>, depois clique novamente para marcar <strong>destino</strong>
+                </div>
+                <div id="routesMap"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB: USUÁRIOS -->
+    <div id="usersTab" class="tab-content">
+        <div class="users-container">
+            <div class="users-header">
+                <h2>Gerenciar Usuários</h2>
+            </div>
+
+            <div class="users-stats">
+                <div class="stat-card">
+                    <div class="stat-label">Total de Usuários</div>
+                    <div class="stat-value" id="totalUsers">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Administradores</div>
+                    <div class="stat-value" id="adminCount">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Usuários Ativos</div>
+                    <div class="stat-value" id="activeUsers">0</div>
+                </div>
+            </div>
+
+            <div class="users-table-container">
+                <table class="users-table">
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Email</th>
+                            <th>Tipo</th>
+                            <th>Data de Cadastro</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTableBody">
+                        <tr>
+                            <td colspan="5" style="text-align:center;color:#9ca3af;">Carregando usuários...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="toast"></div>
+
+    <!-- Modal de Edição de Usuário -->
+    <div id="editUserModal" class="modal-overlay">
+        <div class="modal">
+            <h2 class="modal-title">Editar Usuário</h2>
+            <form id="editUserForm">
+                <div class="modal-form-group">
+                    <label class="modal-form-label">Nome</label>
+                    <input type="text" id="editUserName" class="modal-form-input" required>
+                </div>
+                <div class="modal-form-group">
+                    <label class="modal-form-label">Email</label>
+                    <input type="email" id="editUserEmail" class="modal-form-input" required>
+                </div>
+                <div class="modal-form-group">
+                    <label class="modal-form-label">Saldo (R$)</label>
+                    <input type="number" id="editUserBalance" class="modal-form-input" step="0.01" min="0" required>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="modal-btn modal-btn-cancel" onclick="closeEditUserModal()">Cancelar</button>
+                    <button type="submit" class="modal-btn modal-btn-save">Salvar Alterações</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="firestore-service.js"></script>
+    <script src="admin-dashboard.js"></script>
+</body>
+</html>
