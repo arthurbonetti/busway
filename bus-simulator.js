@@ -73,6 +73,20 @@ class BusSimulator {
             // Se terminou a pré-rota, mudar para rota principal
             if (this.isInPreRoute) {
                 console.log('[BusSimulator] ✅ Pré-rota concluída! Mudando para rota principal');
+
+                // Ao chegar na origem via pré-rota, debita imediatamente e inicia trânsito.
+                try {
+                    const tripDoc = await db.collection('active_trips').doc(this.activeTripId).get();
+                    if (tripDoc.exists) {
+                        const tripData = tripDoc.data();
+                        if (tripData.status === 'approaching_origin' || tripData.status === 'waiting_bus') {
+                            await this.debitTrip(tripData);
+                        }
+                    }
+                } catch (error) {
+                    console.error('[BusSimulator] Erro ao debitar no fim da pré-rota:', error);
+                }
+
                 this.isInPreRoute = false;
                 this.currentIndex = 0;
                 this.lastUpdateTime = Date.now();
@@ -269,7 +283,7 @@ class BusSimulator {
             const tripData = tripDoc.data();
 
             // Se já foi debitado, não fazer nada
-            if (tripData.status !== 'approaching_origin') {
+            if (tripData.status !== 'approaching_origin' && tripData.status !== 'waiting_bus') {
                 return;
             }
 

@@ -1,10 +1,5 @@
 /* ========== MELHORIAS DE UX/UI - BUSWAY ========== */
 
-/* Transições suaves globais */
-* {
-    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, transform 0.2s ease;
-}
-
 /* Animações de entrada */
 @keyframes fadeIn {
     from {
@@ -298,10 +293,6 @@ html {
 
 /* Responsivo - Animações reduzidas em mobile */
 @media (max-width: 768px) {
-    * {
-        transition-duration: 0.2s !important;
-    }
-
     .route-card:hover,
     .stat-card:hover,
     .feature-card:hover {

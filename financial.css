@@ -642,7 +642,7 @@ input:checked + .slider:before {
     display: none;
 }
 
-.payment-option label {
+.payment-card {
     display: flex;
     align-items: center;
     gap: 15px;
@@ -654,9 +654,76 @@ input:checked + .slider:before {
     transition: all 0.3s;
 }
 
-.payment-option input[type="radio"]:checked + label {
+.payment-card:hover {
+    background: #e5e7eb;
+}
+
+.payment-option input[type="radio"]:checked + .payment-card {
     border-color: #667eea;
     background: rgba(102, 126, 234, 0.1);
+}
+
+/* Ajustes de modo escuro para manter padrão visual */
+body.dark-theme .page-title,
+body.dark-theme .balance-header h2,
+body.dark-theme .section-header h2,
+body.dark-theme .chart-container h3,
+body.dark-theme .payment-methods h4 {
+    color: #cbd5e1 !important;
+}
+
+body.dark-theme .stat-content h3,
+body.dark-theme .transaction-date,
+body.dark-theme .transaction-category,
+body.dark-theme .custom-amount label,
+body.dark-theme .setting-item label {
+    color: #94a3b8 !important;
+}
+
+body.dark-theme .transactions-section,
+body.dark-theme .controls-section,
+body.dark-theme .chart-container,
+body.dark-theme .auto-recharge-section,
+body.dark-theme .auto-recharge-card,
+body.dark-theme .modal-content {
+    background: #1e293b !important;
+    border: 1px solid #334155 !important;
+}
+
+body.dark-theme .transaction-item {
+    border-bottom: 1px solid rgba(51, 65, 85, 0.8) !important;
+}
+
+body.dark-theme .transaction-item:hover {
+    background: rgba(102, 126, 234, 0.12) !important;
+}
+
+body.dark-theme .transaction-desc {
+    color: #cbd5e1 !important;
+}
+
+body.dark-theme .btn-load-more {
+    background: #334155 !important;
+    color: #cbd5e1 !important;
+}
+
+body.dark-theme .btn-load-more:hover {
+    background: #475569 !important;
+}
+
+body.dark-theme .payment-card {
+    background: #0f172a !important;
+    border: 1px solid #334155 !important;
+    color: #cbd5e1 !important;
+}
+
+body.dark-theme .payment-card:hover {
+    background: #172033 !important;
+}
+
+body.dark-theme .payment-option input[type="radio"]:checked + .payment-card {
+    border-color: #667eea !important;
+    background: rgba(102, 126, 234, 0.18) !important;
 }
 
 .modal-footer {

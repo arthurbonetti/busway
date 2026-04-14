@@ -1,28 +1,34 @@
 // Service Worker para Busway PWA
-const CACHE_NAME = 'busway-v1';
+const CACHE_NAME = 'busway-v3';
 const CACHE_URLS = [
     '/',
+    '/landing.html',
+    '/landing.css',
     '/index.html',
-    '/routes.html',
     '/user-dashboard.html',
     '/admin-dashboard.html',
+    '/admin-feedbacks.html',
+    '/routes-simple.html',
+    '/location-simple.html',
     '/financial.html',
     '/history.html',
     '/settings.html',
     '/styles.css',
-    '/routes.css',
     '/user-dashboard.css',
     '/financial.css',
+    '/dark-mode.css',
+    '/location-simple.css',
+    '/admin-feedbacks.css',
     '/firebase-config.js',
     '/firestore-service.js',
     '/script.js',
-    '/routes.js',
+    '/routes-simple.js',
     '/admin-dashboard.js',
+    '/admin-feedbacks.js',
     '/user-dashboard.js',
-    '/real-routes.js',
-    '/route-cache.js',
-    '/osm-routing.js',
-    '/notification-system.js',
+    '/dark-mode-global.js',
+    '/bus-simulator.js',
+    '/location-simple.js',
     '/financial-control.js',
     '/financial-ui.js',
     '/history.js',
@@ -72,6 +78,10 @@ self.addEventListener('activate', (event) => {
 
 // Interceptar requisições
 self.addEventListener('fetch', (event) => {
+    if (event.request.method !== 'GET') {
+        return;
+    }
+
     const url = new URL(event.request.url);
 
     // Ignorar requisições Firebase/Firestore
@@ -84,10 +94,28 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
+    // Recursos críticos do dashboard e imagens de anúncio não devem ficar presos em cache antigo.
+    const isAdAsset = url.pathname.includes('/assets/ads/');
+    const isDashboardCritical =
+        url.pathname.endsWith('/user-dashboard.html') ||
+        url.pathname.endsWith('/user-dashboard.js');
+
+    if (isAdAsset || isDashboardCritical) {
+        event.respondWith(
+            fetch(event.request, { cache: 'no-store' })
+                .catch(() => caches.match(event.request))
+        );
+        return;
+    }
+
     // Estratégia: Network First, fallback para Cache
     event.respondWith(
         fetch(event.request)
             .then((response) => {
+                if (!response || response.status !== 200) {
+                    return response;
+                }
+
                 // Clonar a resposta
                 const responseToCache = response.clone();
 

@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Busway - Sistema inteligente de transporte público. Rotas em tempo real, pagamentos digitais e histórico de viagens.">
+    <meta name="theme-color" content="#2563eb">
+    <meta property="og:title" content="Busway - Seu transporte, simplificado">
+    <meta property="og:description" content="Acompanhe rotas em tempo real, pague com facilidade e tenha todo o histórico das suas viagens.">
+    <meta property="og:type" content="website">
+    <title>Busway - Seu transporte, simplificado</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="landing.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <header class="navbar" role="banner">
+        <div class="navbar-container">
+            <a href="landing.html" class="navbar-brand" aria-label="Busway - Página inicial">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M4 16c0 .88.39 1.67 1 2.22V20a1 1 0 001 1h1a1 1 0 001-1v-1h8v1a1 1 0 001 1h1a1 1 0 001-1v-1.78c.61-.55 1-1.34 1-2.22V6c0-3.5-3.58-4-8-4s-8 .5-8 4v10zm3.5 1c-.83 0-1.5-.67-1.5-1.5S6.67 14 7.5 14s1.5.67 1.5 1.5S8.33 17 7.5 17zm9 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm1.5-6H6V6h12v5z" fill="#667eea"/>
+                </svg>
+                <span class="navbar-logo">Busway</span>
+            </a>
+
+            <nav class="navbar-links" aria-label="Navegação principal">
+                <a href="#promo">Vantagens</a>
+                <a href="#how-it-works">Como Funciona</a>
+            </nav>
+
+            <div class="navbar-actions">
+                <a href="index.html" class="btn-login">Entrar</a>
+                <a href="index.html" class="btn-signup">Criar Conta</a>
+            </div>
+
+            <button class="navbar-toggle" aria-label="Abrir menu" aria-expanded="false" id="navToggle">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+                    <line x1="3" y1="6" x2="21" y2="6"/>
+                    <line x1="3" y1="12" x2="21" y2="12"/>
+                    <line x1="3" y1="18" x2="21" y2="18"/>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- Mobile Nav Overlay -->
+    <div class="mobile-nav" id="mobileNav" role="navigation" aria-label="Menu mobile">
+        <a href="#promo">Vantagens</a>
+        <a href="#how-it-works">Como Funciona</a>
+        <a href="index.html">Entrar</a>
+        <a href="index.html" class="btn-signup">Criar Conta</a>
+    </div>
+
+    <main>
+        <!-- Hero -->
+        <section class="hero" id="hero">
+            <div class="hero-split">
+                <div class="hero-content">
+                    <h1>Seu transporte público <span class="hero-gradient">na palma da mão</span></h1>
+                    <p>Acompanhe rotas em tempo real, pague com facilidade e tenha todo o histórico das suas viagens em um só lugar.</p>
+                    <div class="hero-actions">
+                        <a href="index.html" class="btn-primary">
+                            Comece agora
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <line x1="5" y1="12" x2="19" y2="12"/>
+                                <polyline points="12 5 19 12 12 19"/>
+                            </svg>
+                        </a>
+                        <a href="#promo" class="btn-secondary">Saiba mais</a>
+                    </div>
+                </div>
+
+                <div class="hero-carousel" aria-label="Cidades atendidas">
+                    <div class="carousel-track" id="carouselTrack">
+                        <img src="assets/chapeco.jpeg" alt="Chapecó" class="carousel-img active" />
+                        <img src="assets/nonoai.jpg" alt="Nonoai" class="carousel-img" />
+                        <img src="assets/pinhalzinho.jpg" alt="Pinhalzinho" class="carousel-img" />
+                    </div>
+                    <div class="carousel-dots" id="carouselDots">
+                        <button class="dot active" aria-label="Imagem 1" data-index="0"></button>
+                        <button class="dot" aria-label="Imagem 2" data-index="1"></button>
+                        <button class="dot" aria-label="Imagem 3" data-index="2"></button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Promo Banner -->
+        <section class="promo-banner" id="promo">
+            <div class="promo-container">
+                <div class="promo-icon">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" fill="#10b981"/>
+                    </svg>
+                </div>
+                <div class="promo-text">
+                    <h2>100% gratuito para você</h2>
+                    <p>O Busway não tem nenhum custo. Crie sua conta, planeje suas rotas e acompanhe seus ônibus sem pagar nada.</p>
+                </div>
+                <a href="index.html" class="btn-primary promo-cta">
+                    Criar conta grátis
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <line x1="5" y1="12" x2="19" y2="12"/>
+                        <polyline points="12 5 19 12 12 19"/>
+                    </svg>
+                </a>
+            </div>
+        </section>
+
+        <!-- How it works -->
+        <section class="how-it-works" id="how-it-works">
+            <div class="section-container">
+                <div class="section-header">
+                    <h2>Como funciona</h2>
+                    <p>Três passos simples para transformar suas viagens.</p>
+                </div>
+
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <h3>Crie sua conta</h3>
+                        <p>Cadastre-se em segundos com e-mail ou sua conta Google.</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <h3>Escolha sua rota</h3>
+                        <p>Encontre a linha de ônibus ideal para o seu trajeto diário.</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <h3>Viaje com tranquilidade</h3>
+                        <p>Acompanhe em tempo real e pague tudo pelo aplicativo.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Stats -->
+        <section class="stats">
+            <div class="stats-grid">
+                <div>
+                    <div class="stat-number">15+</div>
+                    <div class="stat-label">Rotas ativas</div>
+                </div>
+                <div>
+                    <div class="stat-number">20+</div>
+                    <div class="stat-label">Usuários ativos</div>
+                </div>
+                <div>
+                    <div class="stat-number">100+</div>
+                    <div class="stat-label">Viagens realizadas</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Final -->
+        <section class="cta-section">
+            <h2>Pronto para simplificar suas viagens?</h2>
+            <p>Junte-se aos usuários que já utilizam o Busway no dia a dia.</p>
+            <a href="index.html" class="btn-primary">
+                Criar conta gratuita
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <line x1="5" y1="12" x2="19" y2="12"/>
+                    <polyline points="12 5 19 12 12 19"/>
+                </svg>
+            </a>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer" role="contentinfo">
+        <div class="footer-container">
+            <div class="footer-brand">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M4 16c0 .88.39 1.67 1 2.22V20a1 1 0 001 1h1a1 1 0 001-1v-1h8v1a1 1 0 001 1h1a1 1 0 001-1v-1.78c.61-.55 1-1.34 1-2.22V6c0-3.5-3.58-4-8-4s-8 .5-8 4v10zm3.5 1c-.83 0-1.5-.67-1.5-1.5S6.67 14 7.5 14s1.5.67 1.5 1.5S8.33 17 7.5 17zm9 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm1.5-6H6V6h12v5z" fill="#667eea"/>
+                </svg>
+                <div>
+                    <span class="footer-logo">Busway</span>
+                    <span class="footer-tagline"> — Seu transporte, simplificado</span>
+                </div>
+            </div>
+            <span class="footer-copyright">&copy; 2026 Busway. Todos os direitos reservados.</span>
+        </div>
+    </footer>
+
+    <!-- Mobile nav toggle + Carousel -->
+    <script>
+        // Mobile nav
+        var toggle = document.getElementById('navToggle');
+        var nav = document.getElementById('mobileNav');
+        toggle.addEventListener('click', function() {
+            var open = nav.classList.toggle('active');
+            toggle.setAttribute('aria-expanded', open);
+        });
+        nav.addEventListener('click', function(e) {
+            if (e.target.tagName === 'A') { nav.classList.remove('active'); toggle.setAttribute('aria-expanded', 'false'); }
+        });
+
+        // Carousel
+        (function() {
+            var imgs = document.querySelectorAll('.carousel-img');
+            var dots = document.querySelectorAll('.dot');
+            var current = 0;
+            var total = imgs.length;
+
+            function show(index) {
+                imgs[current].classList.remove('active');
+                dots[current].classList.remove('active');
+                current = index;
+                imgs[current].classList.add('active');
+                dots[current].classList.add('active');
+            }
+
+            dots.forEach(function(dot) {
+                dot.addEventListener('click', function() {
+                    show(parseInt(this.dataset.index));
+                });
+            });
+
+            setInterval(function() {
+                show((current + 1) % total);
+            }, 4000);
+        })();
+    </script>
+
+    <!-- PWA Service Worker -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then((registration) => {
+                        registration.update();
+
+                        if (registration.waiting) {
+                            registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+                        }
+
+                        registration.addEventListener('updatefound', () => {
+                            const newWorker = registration.installing;
+                            if (!newWorker) return;
+
+                            newWorker.addEventListener('statechange', () => {
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    newWorker.postMessage({ type: 'SKIP_WAITING' });
+                                }
+                            });
+                        });
+                    })
+                    .catch((error) => {
+                        console.log('[PWA] Falha ao registrar Service Worker:', error);
+                    });
+
+                navigator.serviceWorker.addEventListener('controllerchange', () => {
+                    if (!window.__swReloadedOnce) {
+                        window.__swReloadedOnce = true;
+                        window.location.reload();
+                    }
+                });
+            });
+        }
+    </script>
+</body>
+</html>

@@ -2,7 +2,7 @@
   "name": "Busway - Sistema de Transporte Público",
   "short_name": "Busway",
   "description": "Sistema inteligente de transporte público com rastreamento em tempo real",
-  "start_url": "/index.html",
+  "start_url": "/landing.html",
   "display": "standalone",
   "background_color": "#667eea",
   "theme_color": "#0071e3",
@@ -31,7 +31,7 @@
       "name": "Buscar Rotas",
       "short_name": "Rotas",
       "description": "Buscar rotas disponíveis",
-      "url": "/routes.html",
+      "url": "/routes-simple.html",
       "icons": [
         {
           "src": "icon-192.png",

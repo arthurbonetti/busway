@@ -153,10 +153,20 @@ body {
     flex-shrink: 0;
     width: 20px;
     height: 20px;
+    color: #1a1a1a;
 }
 
 .info-icon svg {
     display: block;
+}
+
+/* Permite que SVGs com cores fixas sigam o tema via currentColor */
+.info-icon svg [stroke="#1a1a1a"] {
+    stroke: currentColor;
+}
+
+.info-icon svg [fill="#1a1a1a"] {
+    fill: currentColor;
 }
 
 .info-content {
@@ -187,4 +197,86 @@ body {
     font-size: 12px;
     color: #6b7280;
     font-weight: 400;
+}
+
+/* Dark mode alinhado com rotas e pagamentos */
+body.dark-theme {
+    background: #0f172a !important;
+    color: #cbd5e1 !important;
+}
+
+body.dark-theme .navbar {
+    background: #1e293b !important;
+    border-bottom: 1px solid #334155 !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35) !important;
+}
+
+body.dark-theme .page-title,
+body.dark-theme .route-name,
+body.dark-theme .info-text,
+body.dark-theme .info-row,
+body.dark-theme .info-content,
+body.dark-theme .info-content *,
+body.dark-theme #tripStatus,
+body.dark-theme #etaValue,
+body.dark-theme #busDistance,
+body.dark-theme #totalDuration,
+body.dark-theme #routeOrigin,
+body.dark-theme #routeDestination,
+body.dark-theme #driverName {
+    color: #cbd5e1 !important;
+}
+
+body.dark-theme .info-card {
+    background: #1e293b !important;
+    border-top: 1px solid #334155 !important;
+    box-shadow: 0 -2px 16px rgba(0, 0, 0, 0.35) !important;
+}
+
+body.dark-theme .trip-header,
+body.dark-theme .info-row {
+    border-color: #334155 !important;
+}
+
+body.dark-theme .info-icon {
+    color: #ffffff !important;
+}
+
+body.dark-theme .info-icon svg {
+    color: #ffffff !important;
+    stroke: #ffffff !important;
+}
+
+body.dark-theme .info-icon svg * {
+    stroke: #ffffff !important;
+}
+
+body.dark-theme .info-icon svg [stroke]:not([stroke="none"]) {
+    stroke: #ffffff !important;
+}
+
+body.dark-theme .info-icon svg [fill]:not([fill="none"]) {
+    fill: #ffffff !important;
+}
+
+body.dark-theme .price-value {
+    color: #ef4444 !important;
+}
+
+body.dark-theme .price-note {
+    color: #94a3b8 !important;
+}
+
+body.dark-theme .btn-cancel {
+    color: #fda4af !important;
+    border-color: rgba(251, 113, 133, 0.65) !important;
+}
+
+body.dark-theme .btn-cancel:hover {
+    background: rgba(225, 29, 72, 0.2) !important;
+    color: #fecdd3 !important;
+}
+
+body.dark-theme .nav-home:hover {
+    background: #334155 !important;
 }

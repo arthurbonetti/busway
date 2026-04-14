@@ -4,6 +4,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const logoutBtn = document.getElementById('logoutBtn');
     const notification = document.getElementById('notification');
 
+    // Inicializa os anúncios cedo sem bloquear o restante do dashboard.
+    try {
+        initAdCarousel();
+    } catch (error) {
+        console.error('Falha ao inicializar anúncios:', error);
+    }
+
     function showNotification(message, type = 'info') {
         notification.textContent = message;
         notification.className = `notification show ${type}`;
@@ -58,7 +65,7 @@ document.addEventListener('DOMContentLoaded', function() {
         sessionStorage.removeItem('buswaySession');
 
         setTimeout(() => {
-            window.location.href = 'index.html';
+            window.location.href = 'landing.html';
         }, 1000);
     });
 
@@ -333,7 +340,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // Verificar se há viagem ativa no Firestore
             const snapshot = await db.collection('active_trips')
                 .where('userId', '==', userId)
-                .where('status', 'in', ['waiting_bus', 'in_transit'])
+                .where('status', 'in', ['approaching_origin', 'waiting_bus', 'in_transit'])
                 .limit(1)
                 .get();
 
@@ -390,63 +397,227 @@ document.addEventListener('DOMContentLoaded', function() {
         checkSession();
     }, 60000);
 
-    // Initialize Ad Carousel
-    initAdCarousel();
 });
 
 // ===== AD CAROUSEL =====
 function initAdCarousel() {
-    // Array de URLs das imagens de anúncio (você pode substituir por suas imagens)
-    const adImages = [
-        'assets/ads/ad1.jpg',
-        'assets/ads/ad2.jpg',
-        'assets/ads/ad3.jpg',
-        'assets/ads/ad4.jpg',
-        'assets/ads/ad5.jpg'
-    ];
+    const adsVersion = '20260324';
+    const adFiles = ['ad1.jpg', 'ad2.jpg', 'ad3.jpg', 'ad4.jpg', 'ad5.jpg'];
+    const defaultAdPaths = adFiles.map((file) => `assets/ads/${file}?v=${adsVersion}`);
+    const adImageCandidates = adFiles.map((file) => ([
+        `assets/ads/${file}?v=${adsVersion}`,
+        `./assets/ads/${file}?v=${adsVersion}`,
+        `/assets/ads/${file}?v=${adsVersion}`
+    ]));
 
     let currentAdIndex = 0;
     const adImage = document.getElementById('adImage');
     const adIndicatorsContainer = document.getElementById('adIndicators');
+    const adCarousel = document.getElementById('adCarousel');
 
-    // Verificar se há imagens
-    if (adImages.length === 0 || !adImage) return;
+    if (!adImage || !adIndicatorsContainer || !adCarousel || adImageCandidates.length === 0) {
+        return;
+    }
 
-    // Criar indicadores
-    adImages.forEach((_, index) => {
-        const indicator = document.createElement('button');
-        indicator.className = 'ad-indicator' + (index === 0 ? ' active' : '');
-        indicator.setAttribute('aria-label', `Anúncio ${index + 1}`);
-        indicator.onclick = () => showAd(index);
-        adIndicatorsContainer.appendChild(indicator);
-    });
+    if (adCarousel.dataset.initialized === 'true') {
+        return;
+    }
+    adCarousel.dataset.initialized = 'true';
 
-    // Mostrar primeiro anúncio
-    function showAd(index) {
-        currentAdIndex = index;
-        adImage.src = adImages[currentAdIndex];
+    let autoRotateTimer = null;
+    let retryTimer = null;
+    let retryAttempt = 0;
+    const maxRetryAttempts = 6;
+    let validImages = [...defaultAdPaths];
+    let hasLoadedAtLeastOneAd = false;
+    adIndicatorsContainer.innerHTML = '';
 
-        // Atualizar indicadores
-        const indicators = document.querySelectorAll('.ad-indicator');
-        indicators.forEach((ind, i) => {
-            if (i === currentAdIndex) {
-                ind.classList.add('active');
-            } else {
-                ind.classList.remove('active');
-            }
+    function stopAutoRotate() {
+        if (autoRotateTimer) {
+            clearInterval(autoRotateTimer);
+            autoRotateTimer = null;
+        }
+    }
+
+    function startAutoRotate() {
+        stopAutoRotate();
+        autoRotateTimer = setInterval(rotateAd, 6000);
+    }
+
+    function clearRetryTimer() {
+        if (retryTimer) {
+            clearTimeout(retryTimer);
+            retryTimer = null;
+        }
+    }
+
+    function scheduleRetry() {
+        if (retryAttempt >= maxRetryAttempts) {
+            return;
+        }
+
+        clearRetryTimer();
+        const delay = Math.min(2000 * Math.pow(1.5, retryAttempt), 15000);
+        retryTimer = setTimeout(() => {
+            retryAttempt += 1;
+            loadAds();
+        }, delay);
+    }
+
+    function setFallbackState(shouldRetry = true) {
+        stopAutoRotate();
+
+        validImages = [];
+        adImage.removeAttribute('src');
+        adImage.classList.remove('active');
+        adImage.alt = 'Nenhum anúncio disponível';
+        adIndicatorsContainer.innerHTML = '';
+        adIndicatorsContainer.style.display = 'none';
+
+        if (shouldRetry) {
+            scheduleRetry();
+        }
+    }
+
+    function probeImage(url) {
+        return new Promise((resolve) => {
+            const testImage = new Image();
+            testImage.onload = () => resolve(true);
+            testImage.onerror = () => resolve(false);
+            testImage.src = url;
         });
     }
 
-    // Rotação automática a cada 6 segundos
+    async function resolveWorkingImages(candidatesByFile) {
+        const working = [];
+        for (const candidates of candidatesByFile) {
+            for (const url of candidates) {
+                // Para cada arquivo, escolhe somente a primeira URL válida.
+                if (await probeImage(url)) {
+                    working.push(url);
+                    break;
+                }
+            }
+        }
+        return working;
+    }
+
+    function updateIndicators() {
+        const indicators = adIndicatorsContainer.querySelectorAll('.ad-indicator');
+        indicators.forEach((ind, i) => {
+            ind.classList.toggle('active', i === currentAdIndex);
+        });
+    }
+
+    function buildIndicators() {
+        adIndicatorsContainer.innerHTML = '';
+        adIndicatorsContainer.style.display = '';
+        validImages.forEach((_, index) => {
+            const indicator = document.createElement('button');
+            indicator.type = 'button';
+            indicator.className = 'ad-indicator' + (index === currentAdIndex ? ' active' : '');
+            indicator.setAttribute('aria-label', `Anúncio ${index + 1}`);
+            indicator.addEventListener('click', () => {
+                showAd(index);
+                if (autoRotateTimer) {
+                    startAutoRotate();
+                }
+            });
+            adIndicatorsContainer.appendChild(indicator);
+        });
+    }
+
+    function showAd(index) {
+        if (validImages.length === 0) {
+            setFallbackState();
+            return;
+        }
+
+        currentAdIndex = index;
+        adImage.src = validImages[currentAdIndex];
+        adImage.classList.add('active');
+        updateIndicators();
+    }
+
     function rotateAd() {
-        currentAdIndex = (currentAdIndex + 1) % adImages.length;
+        if (validImages.length === 0) {
+            setFallbackState(true);
+            return;
+        }
+
+        currentAdIndex = (currentAdIndex + 1) % validImages.length;
         showAd(currentAdIndex);
     }
 
-    // Iniciar primeiro anúncio
-    showAd(0);
+    adImage.addEventListener('error', () => {
+        if (validImages.length === 0) {
+            setFallbackState(true);
+            return;
+        }
 
-    // Auto-rotation
-    setInterval(rotateAd, 6000);
+        if (validImages.length <= 1) {
+            setFallbackState(true);
+            return;
+        }
+
+        validImages.splice(currentAdIndex, 1);
+
+        if (currentAdIndex >= validImages.length) {
+            currentAdIndex = 0;
+        }
+
+        buildIndicators();
+        showAd(currentAdIndex);
+    });
+
+    adImage.addEventListener('load', () => {
+        hasLoadedAtLeastOneAd = true;
+    });
+
+    function loadAds() {
+        resolveWorkingImages(adImageCandidates).then((workingImages) => {
+            if (workingImages.length === 0) {
+                // Mantém a lista atual e tenta de novo sem apagar o carrossel.
+                scheduleRetry();
+                return;
+            }
+
+            validImages = workingImages;
+
+            clearRetryTimer();
+            retryAttempt = 0;
+            currentAdIndex = 0;
+            buildIndicators();
+            showAd(0);
+            startAutoRotate();
+        }).catch(() => {
+            setFallbackState(true);
+        });
+    }
+
+    window.addEventListener('focus', () => {
+        if (validImages.length === 0) {
+            loadAds();
+        }
+    });
+
+    document.addEventListener('visibilitychange', () => {
+        if (!document.hidden && validImages.length === 0) {
+            loadAds();
+        }
+    });
+
+    window.addEventListener('online', () => {
+        if (validImages.length === 0) {
+            loadAds();
+        }
+    });
+
+    // Exibe algo imediatamente e valida em segundo plano.
+    buildIndicators();
+    showAd(0);
+    startAutoRotate();
+
+    loadAds();
 }
 

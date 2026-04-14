@@ -95,10 +95,34 @@
                 navigator.serviceWorker.register('/service-worker.js')
                     .then((registration) => {
                         console.log('[PWA] Service Worker registrado:', registration.scope);
+
+                        registration.update();
+
+                        if (registration.waiting) {
+                            registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+                        }
+
+                        registration.addEventListener('updatefound', () => {
+                            const newWorker = registration.installing;
+                            if (!newWorker) return;
+
+                            newWorker.addEventListener('statechange', () => {
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    newWorker.postMessage({ type: 'SKIP_WAITING' });
+                                }
+                            });
+                        });
                     })
                     .catch((error) => {
                         console.log('[PWA] Falha ao registrar Service Worker:', error);
                     });
+
+                navigator.serviceWorker.addEventListener('controllerchange', () => {
+                    if (!window.__swReloadedOnce) {
+                        window.__swReloadedOnce = true;
+                        window.location.reload();
+                    }
+                });
             });
         }
     </script>

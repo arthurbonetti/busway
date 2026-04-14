@@ -93,7 +93,7 @@ function switchTab(tabName) {
 
 function logout() {
     sessionStorage.removeItem('buswaySession');
-    window.location.href = 'index.html';
+    window.location.href = 'landing.html';
 }
 
 // ========================================

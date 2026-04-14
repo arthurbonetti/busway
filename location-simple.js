@@ -95,7 +95,7 @@ async function loadActiveTrip() {
     try {
         const snapshot = await db.collection('active_trips')
             .where('userId', '==', currentUserId)
-            .where('status', 'in', ['waiting_bus', 'in_transit'])
+            .where('status', 'in', ['approaching_origin', 'waiting_bus', 'in_transit'])
             .limit(1)
             .get();
 
@@ -134,6 +134,11 @@ function updateStatus(status) {
     const priceNoteEl = document.getElementById('priceNote');
 
     const statusConfig = {
+        'approaching_origin': {
+            icon: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a"><circle cx="12" cy="12" r="10" stroke-width="2"/><path d="M12 6v6l4 2" stroke-width="2" stroke-linecap="round"/></svg>',
+            text: 'Aguardando ônibus...',
+            note: 'Será debitado quando o ônibus chegar'
+        },
         'waiting_bus': {
             icon: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a"><circle cx="12" cy="12" r="10" stroke-width="2"/><path d="M12 6v6l4 2" stroke-width="2" stroke-linecap="round"/></svg>',
             text: 'Aguardando ônibus...',
