@@ -448,12 +448,399 @@
             color: #22543d;
         }
 
+        /* CONFIGURAÇÕES TAB */
+        .settings-container {
+            padding: 24px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .settings-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 8px;
+        }
+
+        .settings-subtitle {
+            font-size: 14px;
+            color: #718096;
+            margin-bottom: 24px;
+        }
+
+        .settings-grid {
+            display: grid;
+            gap: 16px;
+        }
+
+        .setting-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .setting-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .setting-icon {
+            width: 22px;
+            height: 22px;
+            color: #667eea;
+            flex-shrink: 0;
+        }
+
+        .setting-label {
+            font-size: 15px;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .setting-description {
+            font-size: 13px;
+            color: #718096;
+            margin-top: 2px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 52px;
+            height: 30px;
+            flex-shrink: 0;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            inset: 0;
+            cursor: pointer;
+            background: #cbd5e0;
+            border-radius: 20px;
+            transition: all 0.2s;
+        }
+
+        .toggle-slider::before {
+            content: '';
+            position: absolute;
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            top: 4px;
+            background: white;
+            border-radius: 50%;
+            transition: all 0.2s;
+        }
+
+        .toggle-switch input:checked + .toggle-slider {
+            background: #667eea;
+        }
+
+        .toggle-switch input:checked + .toggle-slider::before {
+            transform: translateX(22px);
+        }
+
+        /* FEEDBACKS TAB */
+        .feedbacks-admin-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        .feedbacks-admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .feedbacks-admin-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2d3748;
+        }
+
+        .feedback-filter-select {
+            padding: 8px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: #fff;
+            color: #2d3748;
+            font-size: 14px;
+        }
+
+        .feedback-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .feedback-reply-panel {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .feedback-reply-panel.hidden {
+            display: none;
+        }
+
+        .feedback-reply-panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .feedback-reply-panel-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #2d3748;
+        }
+
+        .feedback-reply-panel-subtitle {
+            font-size: 13px;
+            color: #718096;
+        }
+
+        .feedback-reply-meta {
+            font-size: 13px;
+            color: #4a5568;
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+
+        .feedback-reply-preview {
+            background: #f7fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 12px;
+            color: #374151;
+            font-size: 14px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .feedback-reply-textarea {
+            width: 100%;
+            min-height: 120px;
+            resize: vertical;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 12px;
+            font: inherit;
+            font-size: 14px;
+            color: #2d3748;
+            background: #ffffff;
+            margin-bottom: 12px;
+        }
+
+        .feedback-reply-textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .feedback-reply-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+
+        .feedback-reply-actions-left {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .feedback-reply-btn {
+            width: auto;
+            padding: 10px 16px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .feedback-reply-btn.primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .feedback-reply-btn.secondary {
+            background: #f7fafc;
+            color: #4a5568;
+            border: 1px solid #e2e8f0;
+        }
+
+        .feedback-reply-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .feedback-stat-card {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 16px;
+        }
+
+        .feedback-stat-label {
+            font-size: 12px;
+            color: #718096;
+            margin-bottom: 6px;
+        }
+
+        .feedback-stat-value {
+            font-size: 26px;
+            font-weight: 700;
+            color: #2d3748;
+        }
+
+        .feedback-list {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .feedback-card {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 16px;
+        }
+
+        .feedback-card.selected {
+            border-color: #667eea;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.15);
+        }
+
+        .feedback-card.unread {
+            border-left: 4px solid #667eea;
+        }
+
+        .feedback-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        .feedback-user-email {
+            font-size: 15px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 2px;
+        }
+
+        .feedback-date {
+            font-size: 12px;
+            color: #718096;
+        }
+
+        .feedback-action-btn {
+            border: none;
+            border-radius: 7px;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 8px 12px;
+            cursor: pointer;
+        }
+
+        .feedback-action-btn.read {
+            background: #e0e7ff;
+            color: #4338ca;
+        }
+
+        .feedback-action-btn.unread {
+            background: #e5e7eb;
+            color: #4b5563;
+        }
+
+        .feedback-action-btn.respond {
+            background: #ede9fe;
+            color: #5b21b6;
+        }
+
+        .feedback-actions-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .feedback-text {
+            font-size: 14px;
+            line-height: 1.55;
+            color: #374151;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .feedback-response-box {
+            margin-top: 12px;
+            background: #f3f4f6;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 10px 12px;
+        }
+
+        .feedback-response-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: #6b7280;
+            margin-bottom: 6px;
+        }
+
+        .feedback-response-text {
+            font-size: 13px;
+            line-height: 1.5;
+            color: #374151;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        @media (max-width: 768px) {
+            .feedback-stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .feedback-card-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+
         /* Toast */
         .toast {
             position: fixed;
             bottom: 24px;
             right: 24px;
             background: white;
+            color: #1f2937;
             border: 1px solid #e2e8f0;
             border-radius: 8px;
             padding: 16px 20px;
@@ -603,7 +990,8 @@
     <div class="nav-tabs">
         <button class="nav-tab active" onclick="switchTab('routes')">Rotas</button>
         <button class="nav-tab" onclick="switchTab('users')">Usuários</button>
-        <button class="nav-tab" onclick="window.location.href='admin-feedbacks.html'">Feedbacks</button>
+        <button class="nav-tab" onclick="switchTab('feedbacks')">Feedbacks</button>
+        <button class="nav-tab" onclick="switchTab('settings')">Configurações</button>
     </div>
 
     <!-- TAB: ROTAS -->
@@ -739,6 +1127,118 @@
         </div>
     </div>
 
+    <!-- TAB: FEEDBACKS -->
+    <div id="feedbacksTab" class="tab-content">
+        <div class="feedbacks-admin-container">
+            <div class="feedbacks-admin-header">
+                <h2 class="feedbacks-admin-title">Feedbacks dos Usuários</h2>
+                <select class="feedback-filter-select" id="feedbackFilterStatus">
+                    <option value="all">Todos</option>
+                    <option value="unread" selected>Não Lidos</option>
+                    <option value="read">Lidos</option>
+                    <option value="responded">Respondidos</option>
+                </select>
+            </div>
+
+            <div class="feedback-stats-grid">
+                <div class="feedback-stat-card">
+                    <div class="feedback-stat-label">TOTAL</div>
+                    <div class="feedback-stat-value" id="totalFeedbacks">0</div>
+                </div>
+                <div class="feedback-stat-card">
+                    <div class="feedback-stat-label">NÃO LIDOS</div>
+                    <div class="feedback-stat-value" id="unreadFeedbacks">0</div>
+                </div>
+                <div class="feedback-stat-card">
+                    <div class="feedback-stat-label">LIDOS</div>
+                    <div class="feedback-stat-value" id="readFeedbacks">0</div>
+                </div>
+            </div>
+
+            <div class="feedback-reply-panel hidden" id="feedbackReplyPanel">
+                <div class="feedback-reply-panel-header">
+                    <div>
+                        <div class="feedback-reply-panel-title">Responder feedback</div>
+                        <div class="feedback-reply-panel-subtitle">Selecione um feedback na lista para responder sem sair da tela.</div>
+                    </div>
+                </div>
+                <div class="feedback-reply-meta" id="feedbackReplyMeta">Nenhum feedback selecionado.</div>
+                <div class="feedback-reply-preview" id="feedbackReplyPreview"></div>
+                <textarea id="feedbackReplyText" class="feedback-reply-textarea" placeholder="Escreva a resposta do admin..."></textarea>
+                <div class="feedback-reply-actions">
+                    <div class="feedback-reply-actions-left">
+                        <button type="button" class="feedback-reply-btn primary" id="saveFeedbackReplyBtn">Salvar resposta</button>
+                        <button type="button" class="feedback-reply-btn secondary" id="clearFeedbackReplyBtn">Limpar seleção</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="feedback-list" id="feedbacksContainer"></div>
+
+            <div class="empty-state" id="feedbackEmptyState" style="display:none;">
+                Nenhum feedback encontrado
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB: CONFIGURAÇÕES -->
+    <div id="settingsTab" class="tab-content">
+        <div class="settings-container">
+            <h2 class="settings-title">Configurações do Admin</h2>
+            <p class="settings-subtitle">Tweaks básicos para personalizar seu painel.</p>
+
+            <div class="settings-grid">
+                <div class="setting-card">
+                    <div class="setting-info">
+                        <svg class="setting-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+                        </svg>
+                        <div>
+                            <div class="setting-label">Modo Noturno</div>
+                            <div class="setting-description">Usa o mesmo tema escuro do app do usuário.</div>
+                        </div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="adminDarkModeToggle">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="setting-card">
+                    <div class="setting-info">
+                        <svg class="setting-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622C17.176 19.29 21 14.591 21 9c0-1.042-.133-2.052-.382-3.016z"/>
+                        </svg>
+                        <div>
+                            <div class="setting-label">Confirmar Exclusões</div>
+                            <div class="setting-description">Pede confirmação ao deletar usuários e rotas.</div>
+                        </div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="adminConfirmDeleteToggle">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="setting-card">
+                    <div class="setting-info">
+                        <svg class="setting-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                        </svg>
+                        <div>
+                            <div class="setting-label">Atualizar Usuários Automaticamente</div>
+                            <div class="setting-description">Recarrega a aba Usuários a cada 30 segundos.</div>
+                        </div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="adminAutoRefreshUsersToggle">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast -->
     <div id="toast" class="toast"></div>
 
@@ -755,10 +1255,6 @@
                     <label class="modal-form-label">Email</label>
                     <input type="email" id="editUserEmail" class="modal-form-input" required>
                 </div>
-                <div class="modal-form-group">
-                    <label class="modal-form-label">Saldo (R$)</label>
-                    <input type="number" id="editUserBalance" class="modal-form-input" step="0.01" min="0" required>
-                </div>
                 <div class="modal-actions">
                     <button type="button" class="modal-btn modal-btn-cancel" onclick="closeEditUserModal()">Cancelar</button>
                     <button type="submit" class="modal-btn modal-btn-save">Salvar Alterações</button>
@@ -774,6 +1270,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
     <script src="firebase-config.js"></script>
     <script src="firestore-service.js"></script>
+    <script src="dark-mode-global.js"></script>
     <script src="admin-dashboard.js"></script>
 </body>
 </html>

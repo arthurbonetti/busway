@@ -3,8 +3,6 @@ document.addEventListener('DOMContentLoaded', async function() {
     const darkModeToggle = document.getElementById('darkModeToggle');
     const autoRechargeToggle = document.getElementById('autoRechargeToggle');
     const autoRechargeConfig = document.getElementById('autoRechargeConfig');
-    const feedbackText = document.getElementById('feedbackText');
-    const charCount = document.getElementById('charCount');
     const notification = document.getElementById('notification');
 
     let currentUserId = null;
@@ -167,73 +165,6 @@ document.addEventListener('DOMContentLoaded', async function() {
                 console.error('Erro ao salvar configuração de recarga:', error);
                 showNotification('Erro ao salvar configuração', 'error');
             }
-        }
-    };
-
-    // Character counter para feedback
-    if (feedbackText) {
-        feedbackText.addEventListener('input', function() {
-            const length = this.value.length;
-            charCount.textContent = `${length}/500`;
-
-            // Mudar cor se estiver perto do limite
-            if (length >= 450) {
-                charCount.style.color = '#dc2626';
-            } else if (length >= 400) {
-                charCount.style.color = '#d97706';
-            } else {
-                charCount.style.color = '#9ca3af';
-            }
-        });
-    }
-
-    // Enviar feedback
-    window.submitFeedback = async function() {
-        const feedback = feedbackText.value.trim();
-
-        // Validação
-        if (!feedback) {
-            showNotification('Por favor, escreva seu feedback', 'error');
-            return;
-        }
-
-        if (feedback.length < 10) {
-            showNotification('O feedback deve ter pelo menos 10 caracteres', 'error');
-            return;
-        }
-
-        if (!currentUserId) {
-            showNotification('Erro: usuário não identificado', 'error');
-            return;
-        }
-
-        // Salvar no Firestore
-        try {
-            const feedbackData = {
-                userId: currentUserId,
-                feedbackText: feedback,
-                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                status: 'unread'
-            };
-
-            // Adicionar email do usuário se disponível
-            const userDoc = await db.collection('users').doc(currentUserId).get();
-            if (userDoc.exists && userDoc.data().email) {
-                feedbackData.userEmail = userDoc.data().email;
-            }
-
-            await db.collection('feedback').add(feedbackData);
-
-            showNotification('Feedback enviado com sucesso! Obrigado pela sua opinião.', 'success');
-
-            // Limpar textarea
-            feedbackText.value = '';
-            charCount.textContent = '0/500';
-            charCount.style.color = '#9ca3af';
-
-        } catch (error) {
-            console.error('Erro ao enviar feedback:', error);
-            showNotification('Erro ao enviar feedback. Tente novamente.', 'error');
         }
     };
 

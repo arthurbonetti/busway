@@ -3,6 +3,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const welcomeMessage = document.getElementById('welcomeMessage');
     const logoutBtn = document.getElementById('logoutBtn');
     const notification = document.getElementById('notification');
+    const feedbackText = document.getElementById('dashboardFeedbackText');
+    const feedbackCharCount = document.getElementById('dashboardFeedbackCharCount');
+    const feedbackList = document.getElementById('dashboardFeedbackList');
+    const feedbackEmpty = document.getElementById('dashboardFeedbackEmpty');
+    let currentUserId = null;
 
     // Inicializa os anúncios cedo sem bloquear o restante do dashboard.
     try {
@@ -48,10 +53,181 @@ document.addEventListener('DOMContentLoaded', function() {
         const session = checkSession();
         
         if (session) {
+            currentUserId = session.uid || session.id;
             userNameElement.textContent = session.name;
             welcomeMessage.textContent = `Olá, ${session.name}! Bem-vindo de volta.`;
         }
     }
+
+    function openInitialTabFromUrl() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const tabFromQuery = urlParams.get('tab');
+        const hashTab = window.location.hash ? window.location.hash.replace('#', '') : '';
+        const requestedTab = tabFromQuery || hashTab;
+
+        if (requestedTab === 'feedback') {
+            switchDashboardTab('feedback');
+        }
+    }
+
+    function escapeHtml(value) {
+        return String(value || '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
+    function formatDateTime(value) {
+        if (!value) return '';
+        const date = value?.toDate ? value.toDate() : new Date(value);
+        if (Number.isNaN(date.getTime())) return '';
+
+        return date.toLocaleString('pt-BR', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    }
+
+    function renderUserFeedbacks(feedbacks) {
+        if (!feedbackList || !feedbackEmpty) return;
+
+        if (!feedbacks.length) {
+            feedbackList.innerHTML = '';
+            feedbackEmpty.style.display = 'block';
+            return;
+        }
+
+        feedbackEmpty.style.display = 'none';
+
+        feedbackList.innerHTML = feedbacks.map((feedback) => {
+            const sentAt = formatDateTime(feedback.timestamp);
+            const repliedAt = formatDateTime(feedback.respondedAt);
+            const hasResponse = typeof feedback.adminResponse === 'string' && feedback.adminResponse.trim().length > 0;
+
+            return `
+                <div class="dashboard-feedback-item">
+                    <div class="dashboard-feedback-meta">${sentAt}</div>
+                    <p class="dashboard-feedback-message">${escapeHtml(feedback.feedbackText || '')}</p>
+                    ${hasResponse
+                        ? `<div class="dashboard-feedback-response">
+                            <div class="dashboard-feedback-response-title">Resposta da equipe ${repliedAt ? `• ${repliedAt}` : ''}</div>
+                            <p class="dashboard-feedback-response-text">${escapeHtml(feedback.adminResponse)}</p>
+                        </div>`
+                        : ''
+                    }
+                </div>
+            `;
+        }).join('');
+    }
+
+    async function loadDashboardFeedbacks() {
+        if (!currentUserId || !feedbackList) return;
+
+        try {
+            const snapshot = await db.collection('feedback')
+                .where('userId', '==', currentUserId)
+                .get();
+
+            const feedbacks = [];
+            snapshot.forEach((doc) => {
+                feedbacks.push({
+                    id: doc.id,
+                    ...doc.data()
+                });
+            });
+
+            feedbacks.sort((a, b) => {
+                const aTime = a.timestamp?.toMillis ? a.timestamp.toMillis() : 0;
+                const bTime = b.timestamp?.toMillis ? b.timestamp.toMillis() : 0;
+                return bTime - aTime;
+            });
+
+            renderUserFeedbacks(feedbacks);
+        } catch (error) {
+            console.error('Erro ao carregar feedbacks do dashboard:', error);
+        }
+    }
+
+    if (feedbackText && feedbackCharCount) {
+        feedbackText.addEventListener('input', () => {
+            const length = feedbackText.value.length;
+            feedbackCharCount.textContent = `${length}/500`;
+        });
+    }
+
+    window.submitDashboardFeedback = async function() {
+        if (!feedbackText) return;
+
+        const text = feedbackText.value.trim();
+
+        if (!text) {
+            showNotification('Escreva um feedback antes de enviar', 'error');
+            return;
+        }
+
+        if (text.length < 10) {
+            showNotification('O feedback deve ter pelo menos 10 caracteres', 'error');
+            return;
+        }
+
+        if (!currentUserId) {
+            showNotification('Usuário não identificado', 'error');
+            return;
+        }
+
+        try {
+            const payload = {
+                userId: currentUserId,
+                feedbackText: text,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                status: 'unread'
+            };
+
+            const sessionData = JSON.parse(sessionStorage.getItem('buswaySession') || '{}');
+            if (sessionData.email) {
+                payload.userEmail = sessionData.email;
+            }
+
+            await db.collection('feedback').add(payload);
+
+            feedbackText.value = '';
+            if (feedbackCharCount) feedbackCharCount.textContent = '0/500';
+            showNotification('Feedback enviado com sucesso!', 'success');
+            await loadDashboardFeedbacks();
+        } catch (error) {
+            console.error('Erro ao enviar feedback no dashboard:', error);
+            showNotification('Erro ao enviar feedback. Tente novamente.', 'error');
+        }
+    };
+
+    window.switchDashboardTab = function(tabName, buttonElement) {
+        const homeTab = document.getElementById('homeDashboardTab');
+        const feedbackTab = document.getElementById('feedbackDashboardTab');
+        const tabButtons = document.querySelectorAll('.dashboard-tab-btn');
+
+        tabButtons.forEach((btn) => btn.classList.remove('active'));
+
+        if (buttonElement) {
+            buttonElement.classList.add('active');
+        } else {
+            const index = tabName === 'feedback' ? 1 : 0;
+            if (tabButtons[index]) tabButtons[index].classList.add('active');
+        }
+
+        if (tabName === 'feedback') {
+            if (homeTab) homeTab.classList.remove('active');
+            if (feedbackTab) feedbackTab.classList.add('active');
+            loadDashboardFeedbacks();
+        } else {
+            if (feedbackTab) feedbackTab.classList.remove('active');
+            if (homeTab) homeTab.classList.add('active');
+        }
+    };
 
     logoutBtn.addEventListener('click', async () => {
         showNotification('Saindo...', 'info');
@@ -362,6 +538,16 @@ document.addEventListener('DOMContentLoaded', function() {
     window.checkActiveTrip = checkActiveTrip;
 
     loadUserInfo();
+    openInitialTabFromUrl();
+    loadDashboardFeedbacks();
+
+    if (currentUserId) {
+        db.collection('feedback')
+            .where('userId', '==', currentUserId)
+            .onSnapshot(() => {
+                loadDashboardFeedbacks();
+            });
+    }
 
     // Aplicar tema ao carregar
     function applyTheme(theme) {

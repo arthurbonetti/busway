@@ -17,6 +17,15 @@ let editingRouteId = null;
 let allUsers = [];
 let currentUserId = null;
 let editingUserId = null;
+let usersAutoRefreshInterval = null;
+let allFeedbacks = [];
+let currentFeedbackFilter = 'unread';
+let selectedFeedbackId = null;
+
+const adminSettings = {
+    confirmDelete: true,
+    autoRefreshUsers: false
+};
 
 // Tab ativa
 let currentTab = 'routes';
@@ -45,6 +54,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Inicializar tab Rotas (ativo por padrão)
     initRoutesTab();
+    initSettingsTab();
+    initFeedbacksTab();
 
     // Setup form submit
     document.getElementById('routeForm').addEventListener('submit', handleRouteSubmit);
@@ -55,6 +66,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function switchTab(tabName) {
     console.log('[switchTab]', tabName);
+
+    if (tabName !== 'users') {
+        stopUsersAutoRefresh();
+    }
 
     // Atualizar botões de navegação
     document.querySelectorAll('.nav-tab').forEach(btn => {
@@ -86,7 +101,449 @@ function switchTab(tabName) {
 
         // Carregar usuários
         loadUsersForAdmin();
+        syncUsersAutoRefresh();
+    } else if (tabName === 'feedbacks') {
+        document.getElementById('feedbacksTab').classList.add('active');
+        currentTab = 'feedbacks';
+        loadFeedbacks();
+    } else if (tabName === 'settings') {
+        document.getElementById('settingsTab').classList.add('active');
+        currentTab = 'settings';
     }
+}
+
+// ========================================
+// TAB: FEEDBACKS
+// ========================================
+
+function initFeedbacksTab() {
+    const filterElement = document.getElementById('feedbackFilterStatus');
+    const saveReplyButton = document.getElementById('saveFeedbackReplyBtn');
+    const clearReplyButton = document.getElementById('clearFeedbackReplyBtn');
+    const replyTextarea = document.getElementById('feedbackReplyText');
+
+    if (!filterElement) {
+        return;
+    }
+
+    filterElement.value = currentFeedbackFilter;
+    filterElement.addEventListener('change', (event) => {
+        currentFeedbackFilter = event.target.value;
+        renderFeedbacks();
+    });
+
+    if (saveReplyButton) {
+        saveReplyButton.addEventListener('click', saveSelectedFeedbackReply);
+    }
+
+    if (clearReplyButton) {
+        clearReplyButton.addEventListener('click', clearSelectedFeedbackReply);
+    }
+
+    if (replyTextarea) {
+        replyTextarea.addEventListener('input', () => {
+            if (selectedFeedbackId) {
+                const selectedFeedback = allFeedbacks.find((item) => item.id === selectedFeedbackId);
+                if (selectedFeedback) {
+                    selectedFeedback.adminResponseDraft = replyTextarea.value;
+                }
+            }
+        });
+    }
+}
+
+function escapeHtml(value) {
+    return String(value || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+function updateFeedbackStats() {
+    const total = allFeedbacks.length;
+    const unread = allFeedbacks.filter((feedback) => feedback.status === 'unread').length;
+    const read = allFeedbacks.filter((feedback) => feedback.status === 'read').length;
+
+    document.getElementById('totalFeedbacks').textContent = total;
+    document.getElementById('unreadFeedbacks').textContent = unread;
+    document.getElementById('readFeedbacks').textContent = read;
+}
+
+function renderFeedbacks() {
+    const feedbacksContainer = document.getElementById('feedbacksContainer');
+    const emptyState = document.getElementById('feedbackEmptyState');
+
+    if (!feedbacksContainer || !emptyState) {
+        return;
+    }
+
+    const filteredFeedbacks = allFeedbacks.filter((feedback) => {
+        if (currentFeedbackFilter === 'all') return true;
+
+        if (currentFeedbackFilter === 'responded') {
+            return typeof feedback.adminResponse === 'string' && feedback.adminResponse.trim().length > 0;
+        }
+
+        if (currentFeedbackFilter === 'read') {
+            return feedback.status === 'read';
+        }
+
+        return feedback.status === currentFeedbackFilter;
+    });
+
+    if (filteredFeedbacks.length === 0) {
+        feedbacksContainer.innerHTML = '';
+        emptyState.style.display = 'block';
+        return;
+    }
+
+    emptyState.style.display = 'none';
+
+    feedbacksContainer.innerHTML = filteredFeedbacks.map((feedback) => {
+        const date = feedback.timestamp?.toDate ? feedback.timestamp.toDate() : new Date(feedback.timestamp);
+        const dateStr = date.toLocaleString('pt-BR', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+
+        const hasResponse = typeof feedback.adminResponse === 'string' && feedback.adminResponse.trim().length > 0;
+        const respondedAt = feedback.respondedAt?.toDate ? feedback.respondedAt.toDate() : null;
+        const respondedAtStr = respondedAt
+            ? respondedAt.toLocaleString('pt-BR', {
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            })
+            : '';
+        const isUnread = feedback.status === 'unread';
+        const safeUserEmail = escapeHtml(feedback.userEmail || 'Usuário');
+        const safeFeedbackText = escapeHtml(feedback.feedbackText || '');
+        const safeAdminResponse = hasResponse ? escapeHtml(feedback.adminResponse) : '';
+        const isSelected = feedback.id === selectedFeedbackId;
+
+        return `
+            <div class="feedback-card ${isUnread ? 'unread' : ''} ${isSelected ? 'selected' : ''}" data-feedback-id="${feedback.id}">
+                <div class="feedback-card-header">
+                    <div>
+                        <div class="feedback-user-email">${safeUserEmail}</div>
+                        <div class="feedback-date">${dateStr}</div>
+                    </div>
+                    <div class="feedback-actions-group">
+                        ${isUnread
+                            ? `<button class="feedback-action-btn read" onclick="markAsRead('${feedback.id}')">Marcar como Lido</button>`
+                            : hasResponse
+                                ? ''
+                                : `<button class="feedback-action-btn unread" onclick="markAsUnread('${feedback.id}')">Marcar como Não Lido</button>`
+                        }
+                        <button class="feedback-action-btn respond" onclick="selectFeedbackForReply('${feedback.id}')">
+                            ${hasResponse ? 'Editar Resposta' : 'Responder'}
+                        </button>
+                    </div>
+                </div>
+                <p class="feedback-text">${safeFeedbackText}</p>
+                ${hasResponse
+                    ? `<div class="feedback-response-box">
+                        <div class="feedback-response-title">Resposta do Admin ${respondedAtStr ? `• ${respondedAtStr}` : ''}</div>
+                        <p class="feedback-response-text">${safeAdminResponse}</p>
+                    </div>`
+                    : ''
+                }
+            </div>
+        `;
+    }).join('');
+
+    if (selectedFeedbackId) {
+        highlightSelectedFeedback(selectedFeedbackId);
+    }
+}
+
+function highlightSelectedFeedback(feedbackId) {
+    document.querySelectorAll('.feedback-card').forEach((card) => {
+        card.classList.remove('selected');
+    });
+
+    const selectedCard = document.querySelector(`.feedback-card[data-feedback-id="${feedbackId}"]`);
+
+    if (selectedCard) {
+        selectedCard.classList.add('selected');
+    }
+}
+
+function selectFeedbackForReply(feedbackId) {
+    const feedback = allFeedbacks.find((item) => item.id === feedbackId);
+
+    if (!feedback) {
+        showToast('Feedback não encontrado', 'error');
+        return;
+    }
+
+    selectedFeedbackId = feedbackId;
+
+    const replyPanel = document.getElementById('feedbackReplyPanel');
+    const replyMeta = document.getElementById('feedbackReplyMeta');
+    const replyPreview = document.getElementById('feedbackReplyPreview');
+    const replyTextarea = document.getElementById('feedbackReplyText');
+
+    if (replyPanel) replyPanel.classList.remove('hidden');
+
+    const date = feedback.timestamp?.toDate ? feedback.timestamp.toDate() : new Date(feedback.timestamp);
+    const dateStr = Number.isNaN(date.getTime()) ? '' : date.toLocaleString('pt-BR', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+
+    if (replyMeta) {
+        replyMeta.textContent = `${feedback.userEmail || 'Usuário'}${dateStr ? ` • ${dateStr}` : ''}`;
+    }
+
+    if (replyPreview) {
+        replyPreview.textContent = feedback.feedbackText || '';
+    }
+
+    if (replyTextarea) {
+        replyTextarea.value = feedback.adminResponse || '';
+        replyTextarea.focus();
+    }
+
+    highlightSelectedFeedback(feedbackId);
+}
+
+function clearSelectedFeedbackReply() {
+    selectedFeedbackId = null;
+
+    const replyPanel = document.getElementById('feedbackReplyPanel');
+    const replyMeta = document.getElementById('feedbackReplyMeta');
+    const replyPreview = document.getElementById('feedbackReplyPreview');
+    const replyTextarea = document.getElementById('feedbackReplyText');
+
+    if (replyPanel) replyPanel.classList.add('hidden');
+    if (replyMeta) replyMeta.textContent = 'Nenhum feedback selecionado.';
+    if (replyPreview) replyPreview.textContent = '';
+    if (replyTextarea) replyTextarea.value = '';
+
+    document.querySelectorAll('.feedback-card').forEach((card) => {
+        card.classList.remove('selected');
+    });
+}
+
+async function saveSelectedFeedbackReply() {
+    if (!selectedFeedbackId) {
+        showToast('Selecione um feedback para responder', 'error');
+        return;
+    }
+
+    const replyTextarea = document.getElementById('feedbackReplyText');
+    const responseText = (replyTextarea?.value || '').trim();
+
+    if (responseText.length < 3) {
+        showToast('A resposta deve ter pelo menos 3 caracteres', 'error');
+        return;
+    }
+
+    try {
+        await db.collection('feedback').doc(selectedFeedbackId).update({
+            adminResponse: responseText,
+            respondedAt: firebase.firestore.FieldValue.serverTimestamp(),
+            respondedBy: currentUserId,
+            status: 'read'
+        });
+
+        showToast('Resposta enviada ao usuário', 'success');
+        clearSelectedFeedbackReply();
+        await loadFeedbacks();
+    } catch (error) {
+        console.error('[saveSelectedFeedbackReply] Erro:', error);
+        showToast('Erro ao salvar resposta', 'error');
+    }
+}
+
+async function loadFeedbacks() {
+    try {
+        const snapshot = await db.collection('feedback')
+            .orderBy('timestamp', 'desc')
+            .get();
+
+        allFeedbacks = [];
+        snapshot.forEach((doc) => {
+            allFeedbacks.push({
+                id: doc.id,
+                ...doc.data()
+            });
+        });
+
+        updateFeedbackStats();
+        renderFeedbacks();
+    } catch (error) {
+        console.error('[loadFeedbacks] Erro:', error);
+        showToast('Erro ao carregar feedbacks', 'error');
+    }
+}
+
+async function markAsRead(feedbackId) {
+    try {
+        await db.collection('feedback').doc(feedbackId).update({
+            status: 'read',
+            readAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        showToast('Feedback marcado como lido', 'success');
+        await loadFeedbacks();
+    } catch (error) {
+        console.error('[markAsRead] Erro:', error);
+        showToast('Erro ao atualizar feedback', 'error');
+    }
+}
+
+async function markAsUnread(feedbackId) {
+    try {
+        await db.collection('feedback').doc(feedbackId).update({
+            status: 'unread',
+            readAt: null
+        });
+
+        showToast('Feedback marcado como não lido', 'success');
+        await loadFeedbacks();
+    } catch (error) {
+        console.error('[markAsUnread] Erro:', error);
+        showToast('Erro ao atualizar feedback', 'error');
+    }
+}
+
+// ========================================
+// TAB: CONFIGURAÇÕES
+// ========================================
+
+function getAdminSettingsStorageKey() {
+    return `buswayAdminSettings_${currentUserId || 'default'}`;
+}
+
+function loadAdminSettings() {
+    try {
+        const savedSettings = localStorage.getItem(getAdminSettingsStorageKey());
+        if (!savedSettings) return;
+
+        const parsed = JSON.parse(savedSettings);
+        adminSettings.confirmDelete = parsed.confirmDelete !== false;
+        adminSettings.autoRefreshUsers = parsed.autoRefreshUsers === true;
+    } catch (error) {
+        console.warn('[loadAdminSettings] Falha ao carregar settings:', error);
+    }
+}
+
+function saveAdminSettings() {
+    localStorage.setItem(getAdminSettingsStorageKey(), JSON.stringify(adminSettings));
+}
+
+function stopUsersAutoRefresh() {
+    if (usersAutoRefreshInterval) {
+        clearInterval(usersAutoRefreshInterval);
+        usersAutoRefreshInterval = null;
+    }
+}
+
+function syncUsersAutoRefresh() {
+    stopUsersAutoRefresh();
+
+    if (!adminSettings.autoRefreshUsers || currentTab !== 'users') {
+        return;
+    }
+
+    usersAutoRefreshInterval = setInterval(() => {
+        if (currentTab === 'users') {
+            loadUsersForAdmin();
+        }
+    }, 30000);
+}
+
+async function updateDarkModePreference(enabled) {
+    document.body.classList.toggle('dark-theme', enabled);
+
+    if (!currentUserId) {
+        showToast('Usuário não identificado para salvar preferência', 'error');
+        return;
+    }
+
+    try {
+        await db.collection('users').doc(currentUserId).update({
+            'preferences.darkMode': enabled
+        });
+
+        showToast(enabled ? 'Modo noturno ativado' : 'Modo noturno desativado', 'success');
+    } catch (error) {
+        console.error('[updateDarkModePreference] Erro:', error);
+        showToast('Erro ao salvar modo noturno', 'error');
+    }
+}
+
+async function syncDarkModeToggleState() {
+    const darkModeToggle = document.getElementById('adminDarkModeToggle');
+    if (!darkModeToggle || !currentUserId) return;
+
+    try {
+        const userDoc = await db.collection('users').doc(currentUserId).get();
+        if (!userDoc.exists) return;
+
+        const darkModeEnabled = userDoc.data()?.preferences?.darkMode === true;
+        darkModeToggle.checked = darkModeEnabled;
+        document.body.classList.toggle('dark-theme', darkModeEnabled);
+    } catch (error) {
+        console.error('[syncDarkModeToggleState] Erro:', error);
+    }
+}
+
+function initSettingsTab() {
+    loadAdminSettings();
+
+    const confirmDeleteToggle = document.getElementById('adminConfirmDeleteToggle');
+    const autoRefreshUsersToggle = document.getElementById('adminAutoRefreshUsersToggle');
+    const darkModeToggle = document.getElementById('adminDarkModeToggle');
+
+    if (confirmDeleteToggle) {
+        confirmDeleteToggle.checked = adminSettings.confirmDelete;
+        confirmDeleteToggle.addEventListener('change', (e) => {
+            adminSettings.confirmDelete = e.target.checked;
+            saveAdminSettings();
+            showToast(
+                adminSettings.confirmDelete
+                    ? 'Confirmação de exclusão ativada'
+                    : 'Confirmação de exclusão desativada',
+                'success'
+            );
+        });
+    }
+
+    if (autoRefreshUsersToggle) {
+        autoRefreshUsersToggle.checked = adminSettings.autoRefreshUsers;
+        autoRefreshUsersToggle.addEventListener('change', (e) => {
+            adminSettings.autoRefreshUsers = e.target.checked;
+            saveAdminSettings();
+            syncUsersAutoRefresh();
+            showToast(
+                adminSettings.autoRefreshUsers
+                    ? 'Autoatualização da aba Usuários ativada'
+                    : 'Autoatualização da aba Usuários desativada',
+                'success'
+            );
+        });
+    }
+
+    if (darkModeToggle) {
+        darkModeToggle.addEventListener('change', (e) => {
+            updateDarkModePreference(e.target.checked);
+        });
+    }
+
+    syncDarkModeToggleState();
 }
 
 // ========== LOGOUT ==========
@@ -452,7 +909,7 @@ function editRoute(routeId) {
 }
 
 async function deleteRoute(routeId, routeNumber) {
-    if (!confirm(`Deseja realmente deletar a rota ${routeNumber}?\n\nEsta ação não pode ser desfeita.`)) {
+    if (adminSettings.confirmDelete && !confirm(`Deseja realmente deletar a rota ${routeNumber}?\n\nEsta ação não pode ser desfeita.`)) {
         return;
     }
 
@@ -602,7 +1059,6 @@ function openEditUserModal(userId) {
     // Preencher formulário
     document.getElementById('editUserName').value = user.name || '';
     document.getElementById('editUserEmail').value = user.email || '';
-    document.getElementById('editUserBalance').value = (user.balance || 0).toFixed(2);
 
     // Mostrar modal
     document.getElementById('editUserModal').classList.add('show');
@@ -623,15 +1079,9 @@ async function handleEditUserSubmit(e) {
 
     const name = document.getElementById('editUserName').value.trim();
     const email = document.getElementById('editUserEmail').value.trim();
-    const balance = parseFloat(document.getElementById('editUserBalance').value);
 
     if (!name || !email) {
         showToast('Preencha todos os campos', 'error');
-        return;
-    }
-
-    if (balance < 0) {
-        showToast('O saldo não pode ser negativo', 'error');
         return;
     }
 
@@ -639,7 +1089,6 @@ async function handleEditUserSubmit(e) {
         await db.collection('users').doc(editingUserId).update({
             name: name,
             email: email,
-            balance: balance,
             updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         });
 
@@ -654,15 +1103,17 @@ async function handleEditUserSubmit(e) {
 }
 
 async function confirmDeleteUser(userId, userName) {
-    if (confirm(`Tem certeza que deseja deletar o usuário "${userName}"?\n\nEsta ação não pode ser desfeita.`)) {
-        try {
-            await db.collection('users').doc(userId).delete();
-            showToast('Usuário deletado com sucesso', 'success');
-            await loadUsersForAdmin();
-        } catch (error) {
-            console.error('[confirmDeleteUser] Erro:', error);
-            showToast('Erro ao deletar usuário', 'error');
-        }
+    if (adminSettings.confirmDelete && !confirm(`Tem certeza que deseja deletar o usuário "${userName}"?\n\nEsta ação não pode ser desfeita.`)) {
+        return;
+    }
+
+    try {
+        await db.collection('users').doc(userId).delete();
+        showToast('Usuário deletado com sucesso', 'success');
+        await loadUsersForAdmin();
+    } catch (error) {
+        console.error('[confirmDeleteUser] Erro:', error);
+        showToast('Erro ao deletar usuário', 'error');
     }
 }
 
@@ -688,5 +1139,8 @@ window.deleteRoute = deleteRoute;
 window.openEditUserModal = openEditUserModal;
 window.closeEditUserModal = closeEditUserModal;
 window.confirmDeleteUser = confirmDeleteUser;
+window.markAsRead = markAsRead;
+window.markAsUnread = markAsUnread;
+window.selectFeedbackForReply = selectFeedbackForReply;
 
 console.log('[admin-dashboard] Script carregado');

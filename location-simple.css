@@ -280,3 +280,232 @@ body.dark-theme .btn-cancel:hover {
 body.dark-theme .nav-home:hover {
     background: #334155 !important;
 }
+
+/* Post-trip feedback popup */
+.feedback-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.58);
+    backdrop-filter: blur(2px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 4000;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+
+.feedback-overlay.show {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+.feedback-popup {
+    width: min(620px, 100%);
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 20px 48px rgba(15, 23, 42, 0.3);
+    padding: 22px;
+    transform: translateY(10px) scale(0.98);
+    transition: transform 0.2s ease;
+}
+
+.feedback-overlay.show .feedback-popup {
+    transform: translateY(0) scale(1);
+}
+
+.feedback-popup-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.feedback-popup-eyebrow {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #2563eb;
+    margin-bottom: 4px;
+}
+
+.feedback-popup-header h2 {
+    font-size: 24px;
+    color: #0f172a;
+    margin-bottom: 4px;
+}
+
+.feedback-popup-header p {
+    font-size: 14px;
+    color: #475569;
+}
+
+.feedback-popup-close {
+    border: none;
+    background: #eef2ff;
+    color: #334155;
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.feedback-popup-route {
+    font-size: 13px;
+    color: #334155;
+    background: #f1f5f9;
+    border-radius: 10px;
+    padding: 10px 12px;
+    margin-bottom: 12px;
+}
+
+.feedback-popup-label {
+    display: inline-block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 8px;
+}
+
+.feedback-popup-textarea {
+    width: 100%;
+    min-height: 110px;
+    border: 1px solid #cbd5e1;
+    border-radius: 12px;
+    padding: 12px;
+    font-size: 14px;
+    color: #0f172a;
+    resize: vertical;
+    outline: none;
+}
+
+.feedback-popup-textarea:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+.feedback-popup-footer {
+    margin-top: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+.feedback-popup-counter {
+    font-size: 12px;
+    color: #64748b;
+}
+
+.feedback-popup-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.feedback-popup-button {
+    border: none;
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.feedback-popup-button.secondary {
+    background: #e2e8f0;
+    color: #334155;
+}
+
+.feedback-popup-button.primary {
+    background: #2563eb;
+    color: #ffffff;
+}
+
+.feedback-popup-button.primary:disabled {
+    background: #93c5fd;
+    cursor: not-allowed;
+}
+
+body.trip-feedback-open {
+    overflow: hidden;
+}
+
+body.dark-theme .feedback-overlay {
+    background: rgba(2, 6, 23, 0.72) !important;
+}
+
+body.dark-theme .feedback-popup {
+    background: #1e293b !important;
+    box-shadow: 0 20px 48px rgba(2, 6, 23, 0.6) !important;
+}
+
+body.dark-theme .feedback-popup-eyebrow {
+    color: #93c5fd !important;
+}
+
+body.dark-theme .feedback-popup-header h2 {
+    color: #e2e8f0 !important;
+}
+
+body.dark-theme .feedback-popup-header p,
+body.dark-theme .feedback-popup-label,
+body.dark-theme .feedback-popup-counter {
+    color: #cbd5e1 !important;
+}
+
+body.dark-theme .feedback-popup-close {
+    background: #334155 !important;
+    color: #e2e8f0 !important;
+}
+
+body.dark-theme .feedback-popup-route {
+    background: #0f172a !important;
+    color: #cbd5e1 !important;
+}
+
+body.dark-theme .feedback-popup-textarea {
+    background: #0f172a !important;
+    border-color: #334155 !important;
+    color: #e2e8f0 !important;
+}
+
+body.dark-theme .feedback-popup-textarea:focus {
+    border-color: #60a5fa !important;
+    box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.22) !important;
+}
+
+body.dark-theme .feedback-popup-button.secondary {
+    background: #334155 !important;
+    color: #e2e8f0 !important;
+}
+
+@media (max-width: 640px) {
+    .feedback-popup {
+        padding: 16px;
+    }
+
+    .feedback-popup-header h2 {
+        font-size: 21px;
+    }
+
+    .feedback-popup-footer {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .feedback-popup-actions {
+        width: 100%;
+    }
+
+    .feedback-popup-button {
+        flex: 1;
+    }
+}

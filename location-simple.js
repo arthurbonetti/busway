@@ -10,6 +10,8 @@ let activeTripData = null;
 let busSimulator = null;
 let currentUserId = null;
 let tripUnsubscriber = null;
+let tripFeedbackPopupReady = false;
+let latestCompletedTripDetail = null;
 
 // Ícones personalizados
 const busIcon = L.icon({
@@ -65,6 +67,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Configurar listener em tempo real
     setupRealtimeListener();
+
+    // Preparar popup de feedback pós-viagem
+    setupTripFeedbackPopup();
 
     // Configurar listener para evento de viagem concluída
     window.addEventListener('tripCompleted', handleTripCompleted);
@@ -344,76 +349,143 @@ function updateDistanceAndETA(busLocation) {
 
 function handleTripCompleted(event) {
     console.log('[handleTripCompleted] Viagem concluída!', event.detail);
-
-    const { routeName, routeNumber, origin, destination } = event.detail;
+    latestCompletedTripDetail = event?.detail || null;
 
     // Atualizar status visual para "concluída"
     updateStatus('completed');
 
-    // Mostrar notificação
-    showCompletionNotification(routeName, routeNumber, origin, destination);
-
-    // Redirecionar para o histórico após 3 segundos
-    setTimeout(() => {
-        console.log('[handleTripCompleted] Redirecionando para histórico...');
-        window.location.href = 'history.html';
-    }, 3000);
+    // Mostrar popup de feedback quando disponível
+    showTripFeedbackPopup(latestCompletedTripDetail);
 }
 
-function showCompletionNotification(routeName, routeNumber, origin, destination) {
-    // Criar elemento de notificação se não existir
-    let notification = document.getElementById('tripCompletedNotification');
+function setupTripFeedbackPopup() {
+    if (tripFeedbackPopupReady) return;
 
-    if (!notification) {
-        notification = document.createElement('div');
-        notification.id = 'tripCompletedNotification';
-        notification.style.cssText = `
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: white;
-            padding: 32px;
-            border-radius: 16px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            z-index: 10000;
-            text-align: center;
-            min-width: 300px;
-            animation: slideIn 0.3s ease;
-        `;
-        document.body.appendChild(notification);
+    const overlay = document.getElementById('tripFeedbackOverlay');
+    const textarea = document.getElementById('tripFeedbackComment');
+    const counter = document.getElementById('tripFeedbackCounter');
+    const continueBtn = document.getElementById('tripFeedbackContinueBtn');
+    const skipBtn = document.getElementById('tripFeedbackSkipBtn');
+    const closeBtn = document.getElementById('tripFeedbackCloseBtn');
 
-        // Adicionar CSS de animação
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes slideIn {
-                from { transform: translate(-50%, -60%); opacity: 0; }
-                to { transform: translate(-50%, -50%); opacity: 1; }
-            }
-        `;
-        document.head.appendChild(style);
+    if (!overlay || !textarea || !counter || !continueBtn || !skipBtn || !closeBtn) {
+        console.warn('[setupTripFeedbackPopup] Elementos do popup não encontrados.');
+        return;
     }
 
-    notification.innerHTML = `
-        <div style="margin-bottom: 16px; display: flex; justify-content: center;">
-            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="12" cy="12" r="10" fill="#10b981" stroke="#10b981" stroke-width="2"/>
-                <path d="M8 12l2 2 4-4" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-        </div>
-        <h2 style="font-size: 24px; font-weight: 600; color: #10b981; margin-bottom: 12px;">
-            Viagem Concluída!
-        </h2>
-        <p style="font-size: 16px; color: #4a5568; margin-bottom: 8px;">
-            <strong>Linha ${routeNumber}</strong> - ${routeName}
-        </p>
-        <p style="font-size: 14px; color: #718096;">
-            ${origin} → ${destination}
-        </p>
-        <p style="font-size: 13px; color: #a0aec0; margin-top: 16px;">
-            Redirecionando para o histórico...
-        </p>
-    `;
+    const updateCounter = () => {
+        const textLength = textarea.value.length;
+        counter.textContent = `${textLength}/500`;
+        continueBtn.disabled = textarea.value.trim().length === 0;
+    };
+
+    textarea.addEventListener('input', updateCounter);
+    continueBtn.addEventListener('click', submitTripFeedbackFromPopup);
+    skipBtn.addEventListener('click', redirectAfterTrip);
+    closeBtn.addEventListener('click', redirectAfterTrip);
+
+    overlay.addEventListener('click', (event) => {
+        if (event.target === overlay) {
+            redirectAfterTrip();
+        }
+    });
+
+    updateCounter();
+    tripFeedbackPopupReady = true;
+}
+
+function showTripFeedbackPopup(tripDetail) {
+    const overlay = document.getElementById('tripFeedbackOverlay');
+    const routeInfo = document.getElementById('tripFeedbackRouteInfo');
+    const textarea = document.getElementById('tripFeedbackComment');
+    const counter = document.getElementById('tripFeedbackCounter');
+    const continueBtn = document.getElementById('tripFeedbackContinueBtn');
+
+    if (!overlay || !textarea || !counter || !continueBtn) {
+        console.warn('[showTripFeedbackPopup] Popup indisponível. Redirecionando para histórico.');
+        redirectAfterTrip();
+        return;
+    }
+
+    const routeNumber = tripDetail?.routeNumber || activeTripData?.routeNumber || 'N/A';
+    const routeName = tripDetail?.routeName || activeTripData?.routeName || 'Rota';
+    const origin = tripDetail?.origin || activeTripData?.origin || 'Origem';
+    const destination = tripDetail?.destination || activeTripData?.destination || 'Destino';
+
+    if (routeInfo) {
+        routeInfo.textContent = `Linha ${routeNumber} - ${routeName} | ${origin} -> ${destination}`;
+    }
+
+    textarea.value = '';
+    counter.textContent = '0/500';
+    continueBtn.disabled = true;
+
+    overlay.classList.add('show');
+    overlay.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('trip-feedback-open');
+
+    setTimeout(() => {
+        textarea.focus();
+    }, 50);
+}
+
+function hideTripFeedbackPopup() {
+    const overlay = document.getElementById('tripFeedbackOverlay');
+    if (!overlay) return;
+
+    overlay.classList.remove('show');
+    overlay.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('trip-feedback-open');
+}
+
+async function submitTripFeedbackFromPopup() {
+    const textarea = document.getElementById('tripFeedbackComment');
+    const continueBtn = document.getElementById('tripFeedbackContinueBtn');
+
+    if (!textarea || !continueBtn) {
+        redirectAfterTrip();
+        return;
+    }
+
+    const text = textarea.value.trim();
+    if (!text) {
+        continueBtn.disabled = true;
+        return;
+    }
+
+    continueBtn.disabled = true;
+
+    try {
+        const sessionData = loadUserSession() || {};
+        const payload = {
+            userId: currentUserId,
+            feedbackText: text,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+            status: 'unread',
+            source: 'post_trip_popup',
+            routeNumber: latestCompletedTripDetail?.routeNumber || activeTripData?.routeNumber || null,
+            routeName: latestCompletedTripDetail?.routeName || activeTripData?.routeName || null,
+            origin: latestCompletedTripDetail?.origin || activeTripData?.origin || null,
+            destination: latestCompletedTripDetail?.destination || activeTripData?.destination || null
+        };
+
+        if (sessionData.email) {
+            payload.userEmail = sessionData.email;
+        }
+
+        await db.collection('feedback').add(payload);
+        console.log('[submitTripFeedbackFromPopup] Feedback enviado com sucesso.');
+    } catch (error) {
+        console.error('[submitTripFeedbackFromPopup] Erro ao enviar feedback:', error);
+    }
+
+    redirectAfterTrip();
+}
+
+function redirectAfterTrip() {
+    hideTripFeedbackPopup();
+    console.log('[redirectAfterTrip] Redirecionando para histórico...');
+    window.location.href = 'history.html';
 }
 
 function haversineDistance(lat1, lon1, lat2, lon2) {

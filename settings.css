@@ -66,25 +66,18 @@ body.dark-theme .feedback-card {
     box-shadow: 0 1px 3px rgba(0,0,0,0.3);
 }
 
-body.dark-theme .feedback-card h3 {
-    color: #e6e6e6;
+body.dark-theme .auto-recharge-config {
+    background: #2a2a2a;
 }
 
-body.dark-theme .feedback-card p {
-    color: #999;
-}
-
-body.dark-theme .feedback-textarea {
+body.dark-theme .input-group input {
     background: #333;
     border-color: #444;
     color: #e6e6e6;
 }
 
-body.dark-theme .feedback-textarea::placeholder {
-    color: #666;
-}
-
-body.dark-theme .char-count {
+body.dark-theme .input-group label,
+body.dark-theme .input-suffix {
     color: #999;
 }
 
@@ -307,90 +300,6 @@ input:checked + .toggle-slider:before {
 }
 
 .btn-save:active {
-    transform: translateY(0);
-}
-
-/* Feedback Card */
-.feedback-card {
-    background: white;
-    border-radius: 12px;
-    padding: 24px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-    text-align: center;
-}
-
-.feedback-icon {
-    margin: 0 auto 16px;
-    display: block;
-}
-
-.feedback-card h3 {
-    font-size: 18px;
-    font-weight: 600;
-    color: #1a1a1a;
-    margin-bottom: 8px;
-}
-
-.feedback-card p {
-    font-size: 14px;
-    color: #9ca3af;
-    margin-bottom: 20px;
-}
-
-.feedback-textarea {
-    width: 100%;
-    min-height: 120px;
-    padding: 12px;
-    border: 2px solid #e2e8f0;
-    border-radius: 8px;
-    font-size: 14px;
-    color: #1a1a1a;
-    font-family: inherit;
-    resize: vertical;
-    transition: all 0.2s;
-    margin-bottom: 12px;
-}
-
-.feedback-textarea:focus {
-    outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-}
-
-.feedback-textarea::placeholder {
-    color: #64748b;
-}
-
-.feedback-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.char-count {
-    font-size: 12px;
-    color: #9ca3af;
-}
-
-.btn-submit {
-    padding: 10px 20px;
-    background: #667eea;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.btn-submit:hover {
-    background: #5568d3;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
-}
-
-.btn-submit:active {
     transform: translateY(0);
 }
 

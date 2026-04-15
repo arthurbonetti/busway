@@ -129,6 +129,38 @@
         </div>
     </div>
 
+    <!-- Post-trip Feedback Popup -->
+    <div id="tripFeedbackOverlay" class="feedback-overlay" aria-hidden="true">
+        <div class="feedback-popup" role="dialog" aria-modal="true" aria-labelledby="tripFeedbackTitle">
+            <div class="feedback-popup-header">
+                <div>
+                    <div class="feedback-popup-eyebrow">Viagem Concluida!!!</div>
+                    <h2 id="tripFeedbackTitle">Como foi sua viagem?</h2>
+                    <p>Deixe um feedback rápido antes de sair.</p>
+                </div>
+                <button type="button" class="feedback-popup-close" id="tripFeedbackCloseBtn" aria-label="Fechar">×</button>
+            </div>
+
+            <div class="feedback-popup-route" id="tripFeedbackRouteInfo"></div>
+
+            <label class="feedback-popup-label" for="tripFeedbackComment">Feedback</label>
+            <textarea
+                id="tripFeedbackComment"
+                class="feedback-popup-textarea"
+                maxlength="500"
+                placeholder="Conte o que achou da viagem, do motorista, do tempo de espera..."
+            ></textarea>
+
+            <div class="feedback-popup-footer">
+                <span class="feedback-popup-counter" id="tripFeedbackCounter">0/500</span>
+                <div class="feedback-popup-actions">
+                    <button type="button" class="feedback-popup-button secondary" id="tripFeedbackSkipBtn">Pular</button>
+                    <button type="button" class="feedback-popup-button primary" id="tripFeedbackContinueBtn" disabled>Continuar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Scripts -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
