@@ -6,14 +6,14 @@
     <title>Rastreamento | Busway</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="location-simple.css?v=3.1" />
-    <link rel="stylesheet" href="dark-mode.css">
+    <link rel="stylesheet" href="../../styles/global/dark-mode.css">
 </head>
 <body>
     <div class="app-container">
         <!-- Navbar -->
         <nav class="navbar">
             <div class="nav-left">
-                <button class="nav-home" onclick="window.location.href='user-dashboard.html'" title="Início">
+                <button class="nav-home" onclick="window.location.href='../user/user-dashboard.html'" title="Início">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
                     </svg>
@@ -166,10 +166,10 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-    <script src="firebase-config.js"></script>
-    <script src="firestore-service.js"></script>
-    <script src="dark-mode-global.js"></script>
-    <script src="bus-simulator.js"></script>
+    <script src="../../firebase-config.js"></script>
+    <script src="../../js/services/firestore-service.js"></script>
+    <script src="../../js/utilities/dark-mode-global.js"></script>
+    <script src="../../js/utilities/bus-simulator.js"></script>
     <script src="location-simple.js"></script>
 </body>
 </html>

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard | Busway</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link rel="stylesheet" href="dark-mode.css">
+    <link rel="stylesheet" href="../../styles/global/dark-mode.css">
     <style>
         * {
             margin: 0;
@@ -973,7 +973,7 @@
     <!-- Header -->
     <div class="header">
         <div style="display: flex; align-items: center; gap: 12px;">
-            <button onclick="window.location.href='user-dashboard.html'" style="background: transparent; border: none; color: #667eea; cursor: pointer; padding: 6px; display: flex; align-items: center; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Início">
+            <button onclick="window.location.href='../user/user-dashboard.html'" style="background: transparent; border: none; color: #667eea; cursor: pointer; padding: 6px; display: flex; align-items: center; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Início">
                 <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
                 </svg>
@@ -981,7 +981,7 @@
             <h1 class="header-title">Painel de administração - Busway</h1>
         </div>
         <div class="header-actions">
-            <a href="user-dashboard.html" class="btn-header">← Voltar</a>
+            <a href="../user/user-dashboard.html" class="btn-header">← Voltar</a>
             <button class="btn-header" onclick="logout()">Sair</button>
         </div>
     </div>
@@ -1268,9 +1268,9 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-    <script src="firebase-config.js"></script>
-    <script src="firestore-service.js"></script>
-    <script src="dark-mode-global.js"></script>
+    <script src="../../firebase-config.js"></script>
+    <script src="../../js/services/firestore-service.js"></script>
+    <script src="../../js/utilities/dark-mode-global.js"></script>
     <script src="admin-dashboard.js"></script>
 </body>
 </html>

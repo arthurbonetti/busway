@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Busway - Dashboard</title>
     <link rel="stylesheet" href="user-dashboard.css">
-    <link rel="stylesheet" href="dark-mode.css">
+    <link rel="stylesheet" href="../../styles/global/dark-mode.css">
 </head>
 <body>
     <header class="header">
@@ -34,7 +34,7 @@
                 </div>
                 <h3>Rotas Disponíveis</h3>
                 <p>Veja todas as linhas e selecione sua rota</p>
-                <button class="feature-btn" onclick="window.location.href='routes-simple.html'">Ver Rotas</button>
+                <button class="feature-btn" onclick="window.location.href='../public/routes-simple.html'">Ver Rotas</button>
             </div>
 
             <div class="feature-card">
@@ -56,7 +56,7 @@
                 </div>
                 <h3>Histórico</h3>
                 <p>Veja suas viagens anteriores</p>
-                <button class="feature-btn" onclick="window.location.href='history.html'">Ver Histórico</button>
+                <button class="feature-btn" onclick="window.location.href='../public/history.html'">Ver Histórico</button>
             </div>
 
             <div class="feature-card">
@@ -67,7 +67,7 @@
                 </div>
                 <h3>Pagamentos</h3>
                 <p>Gerencie seus métodos de pagamento</p>
-                <button class="feature-btn" onclick="window.location.href='financial.html'">Gerenciar</button>
+                <button class="feature-btn" onclick="window.location.href='../finance/financial.html'">Gerenciar</button>
             </div>
 
             <div class="feature-card">
@@ -90,7 +90,7 @@
                 </div>
                 <h3>Configurações</h3>
                 <p>Ajuste suas preferências</p>
-                <button class="feature-btn" onclick="window.location.href='settings.html'">Configurar</button>
+                <button class="feature-btn" onclick="window.location.href='../public/settings.html'">Configurar</button>
             </div>
         </div>
 
@@ -105,7 +105,7 @@
                     <div class="wallet-info">
                         <div class="balance-amount">R$ <span id="currentBalance">0,00</span></div>
                         <p class="balance-label">Saldo disponível</p>
-                        <button class="add-funds-btn" onclick="window.location.href='financial.html'">
+                        <button class="add-funds-btn" onclick="window.location.href='../finance/financial.html'">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                                 <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor"/>
                             </svg>
@@ -119,7 +119,7 @@
             <div class="ad-section">
                 <div class="ad-container">
                     <div class="ad-carousel" id="adCarousel">
-                        <img src="assets/ads/ad1.jpg?v=20260324" alt="Anúncio" class="ad-image active" id="adImage" />
+                        <img src="../../assets/ads/ad1.jpg?v=20260324" alt="Anúncio" class="ad-image active" id="adImage" />
                     </div>
                     <div class="ad-indicators" id="adIndicators">
                         <!-- Indicators will be added dynamically -->
@@ -163,9 +163,9 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
     <!-- Configuração e serviços -->
-    <script src="firebase-config.js"></script>
-    <script src="firestore-service.js"></script>
-    <script src="dark-mode-global.js"></script>
+    <script src="../../firebase-config.js"></script>
+    <script src="../../js/services/firestore-service.js"></script>
+    <script src="../../js/utilities/dark-mode-global.js"></script>
     <script src="user-dashboard.js?v=3.2"></script>
 </body>
 </html>

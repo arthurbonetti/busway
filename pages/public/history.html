@@ -5,13 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Histórico | Busway</title>
     <link rel="stylesheet" href="history.css?v=2.0">
-    <link rel="stylesheet" href="dark-mode.css">
+    <link rel="stylesheet" href="../../styles/global/dark-mode.css">
 </head>
 <body>
     <!-- Navbar -->
     <nav class="navbar">
         <div class="nav-content">
-            <button class="nav-back" onclick="window.location.href='user-dashboard.html'" title="Voltar">
+            <button class="nav-back" onclick="window.location.href='../user/user-dashboard.html'" title="Voltar">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                 </svg>
@@ -61,9 +61,9 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
     <!-- App Scripts -->
-    <script src="firebase-config.js"></script>
-    <script src="firestore-service.js"></script>
-    <script src="dark-mode-global.js"></script>
+    <script src="../../firebase-config.js"></script>
+    <script src="../../js/services/firestore-service.js"></script>
+    <script src="../../js/utilities/dark-mode-global.js"></script>
     <script src="history.js?v=2.0"></script>
 </body>
 </html>

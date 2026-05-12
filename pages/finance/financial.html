@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Busway - Controle Financeiro</title>
     <link rel="stylesheet" href="financial.css">
-    <link rel="stylesheet" href="dark-mode.css">
+    <link rel="stylesheet" href="../../styles/global/dark-mode.css">
 </head>
 <body>
     <div class="app-container">
@@ -13,7 +13,7 @@
         <nav class="navbar">
             <div class="nav-content">
                 <div class="nav-left">
-                    <button class="nav-back" onclick="window.location.href='user-dashboard.html'" title="Início">
+                    <button class="nav-back" onclick="window.location.href='../user/user-dashboard.html'" title="Início">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
                         </svg>
@@ -144,10 +144,10 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
     <!-- Configuração e serviços -->
-    <script src="firebase-config.js"></script>
-    <script src="firestore-service.js"></script>
-    <script src="dark-mode-global.js"></script>
-    <script src="financial-control.js"></script>
-    <script src="financial-ui.js"></script>
+    <script src="../../firebase-config.js"></script>
+    <script src="../../js/services/firestore-service.js"></script>
+    <script src="../../js/utilities/dark-mode-global.js"></script>
+    <script src="../../js/financial-control.js"></script>
+    <script src="../../js/financial-ui.js"></script>
 </body>
 </html>
