@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feedbacks | Busway</title>
+    <link rel="stylesheet" href="user-feedbacks.css">
+    <link rel="stylesheet" href="../../styles/global/dark-mode.css">
+</head>
+<body>
+    <header class="header">
+        <div class="header-container">
+            <button class="back-btn" onclick="window.history.back()" title="Voltar">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                </svg>
+            </button>
+            <h1 class="page-title">Feedbacks</h1>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="feedbacks-container">
+            <!-- Seção de Envio -->
+            <div class="feedback-card submit-card">
+                <h3>Enviar Feedback</h3>
+                <p>Conte para a equipe o que pode melhorar no Busway.</p>
+                <textarea
+                    id="feedbackText"
+                    class="feedback-textarea"
+                    maxlength="500"
+                    placeholder="Escreva aqui seu feedback..."
+                ></textarea>
+                <div class="feedback-footer">
+                    <span id="charCount" class="char-count">0/500</span>
+                    <button class="btn-submit" onclick="submitFeedback()">Enviar</button>
+                </div>
+            </div>
+
+            <!-- Seção de Histórico -->
+            <div class="feedback-card history-card">
+                <h3>Meus Feedbacks</h3>
+                <p>Acompanhe respostas da equipe para seus envios.</p>
+                <div id="feedbackList" class="feedback-list"></div>
+                <div id="emptyState" class="empty-state">
+                    <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
+                    </svg>
+                    <h4>Nenhum feedback enviado ainda</h4>
+                    <p>Envie um feedback e acompanhe as respostas aqui</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div class="notification" id="notification"></div>
+
+    <!-- Firebase v8 SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+    <!-- App Scripts -->
+    <script src="../../firebase-config.js"></script>
+    <script src="../../js/services/firestore-service.js"></script>
+    <script src="../../js/utilities/dark-mode-global.js"></script>
+    <script src="user-feedbacks.js"></script>
+</body>
+</html>

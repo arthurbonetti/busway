@@ -47,11 +47,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 name: name,
                 email: email,
                 balance: 0,
-                isAdmin: false
+                isAdmin: false,
+                isDriver: false,
+                role: 'user'
             }));
 
             setTimeout(() => {
-                window.location.href = 'user-dashboard.html';
+                window.location.href = 'pages/user/user-dashboard.html';
             }, 1000);
 
         } catch (error) {
@@ -103,9 +105,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
             setTimeout(() => {
                 if (userData.isAdmin) {
-                    window.location.href = 'admin-dashboard.html';
+                    window.location.href = 'pages/admin/admin-dashboard.html';
+                } else if (userData.isDriver || userData.role === 'driver') {
+                    window.location.href = 'pages/driver/driver-dashboard.html';
                 } else {
-                    window.location.href = 'user-dashboard.html';
+                    window.location.href = 'pages/user/user-dashboard.html';
                 }
             }, 1000);
 
@@ -163,7 +167,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 ...userData
             }));
 
-            window.location.href = 'user-dashboard.html';
+            if (userData.isAdmin) {
+                window.location.href = 'pages/admin/admin-dashboard.html';
+            } else if (userData.isDriver || userData.role === 'driver') {
+                window.location.href = 'pages/driver/driver-dashboard.html';
+            } else {
+                window.location.href = 'pages/user/user-dashboard.html';
+            }
 
         } catch (error) {
             let errorMessage = error.message;

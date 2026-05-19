@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guia Rápido HTTPS no Celular | Busway</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background: linear-gradient(135deg, #eff6ff 0%, #f8fafc 100%);
+            color: #0f172a;
+        }
+        .wrap {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 24px 16px 40px;
+        }
+        .card {
+            background: #ffffff;
+            border: 1px solid #dbeafe;
+            border-radius: 14px;
+            padding: 18px;
+            box-shadow: 0 8px 20px rgba(30, 64, 175, 0.08);
+            margin-bottom: 14px;
+        }
+        h1 {
+            margin: 0 0 10px;
+            font-size: 28px;
+            color: #1d4ed8;
+        }
+        h2 {
+            margin: 0 0 10px;
+            font-size: 18px;
+            color: #1e3a8a;
+        }
+        p, li { line-height: 1.5; }
+        ol { margin: 0; padding-left: 20px; }
+        code {
+            background: #e2e8f0;
+            border-radius: 6px;
+            padding: 2px 6px;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            font-size: 13px;
+        }
+        pre {
+            margin: 8px 0 0;
+            background: #0f172a;
+            color: #f8fafc;
+            border-radius: 10px;
+            padding: 12px;
+            overflow-x: auto;
+            font-size: 13px;
+        }
+        .tip {
+            border-left: 4px solid #2563eb;
+            background: #eff6ff;
+            border-radius: 8px;
+            padding: 10px 12px;
+            margin-top: 8px;
+        }
+        .warn {
+            border-left: 4px solid #f59e0b;
+            background: #fffbeb;
+            border-radius: 8px;
+            padding: 10px 12px;
+            margin-top: 8px;
+        }
+        .actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+        }
+        .btn {
+            border: 0;
+            border-radius: 10px;
+            padding: 10px 14px;
+            background: #2563eb;
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .btn.secondary {
+            background: #334155;
+        }
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <div class="card">
+            <h1>GPS real no celular (HTTPS)</h1>
+            <p>Para o navegador do celular liberar geolocalização, abra o projeto via <strong>HTTPS público</strong> (não apenas localhost).</p>
+            <div class="tip">Resumo: rode local, exponha com túnel HTTPS, abra o link HTTPS no celular e permita localização.</div>
+        </div>
+
+        <div class="card">
+            <h2>Opção 1: Cloudflare Tunnel (grátis)</h2>
+            <ol>
+                <li>Suba um servidor local na pasta do projeto.</li>
+                <li>Abra um túnel HTTPS para a porta local.</li>
+                <li>Use a URL <code>https://...</code> no celular.</li>
+            </ol>
+            <pre># no projeto
+python3 -m http.server 5500
+
+# em outro terminal (com cloudflared instalado)
+cloudflared tunnel --url http://localhost:5500</pre>
+            <p>Copie a URL gerada pelo tunnel e abra no celular.</p>
+        </div>
+
+        <div class="card">
+            <h2>Opção 2: ngrok (grátis)</h2>
+            <pre># no projeto
+python3 -m http.server 5500
+
+# em outro terminal (com ngrok instalado)
+ngrok http 5500</pre>
+            <p>Abra no celular a URL HTTPS exibida pelo ngrok.</p>
+        </div>
+
+        <div class="card">
+            <h2>Checklist rápido</h2>
+            <ol>
+                <li>Usuário do tipo <strong>Motorista</strong> logado.</li>
+                <li>Página <strong>Transmissão GPS</strong> aberta no celular.</li>
+                <li>Permissão de localização concedida no navegador.</li>
+                <li>Uma viagem ativa selecionada e botão <strong>Iniciar GPS real</strong> acionado.</li>
+            </ol>
+            <div class="warn">No iPhone, use Safari. Em alguns Androids, mantenha a tela ativa durante o teste para evitar pausa do GPS.</div>
+            <div class="actions">
+                <a class="btn" href="../driver/driver-live-location.html">Abrir Transmissão GPS</a>
+                <a class="btn secondary" href="../driver/driver-dashboard.html">Voltar ao Painel Motorista</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

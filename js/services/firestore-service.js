@@ -40,6 +40,8 @@ async function createUser(userId, userData) {
         const defaultData = {
             balance: 0,
             isAdmin: false,
+            isDriver: false,
+            role: 'user',
             createdAt: getTimestamp(),
             ...userData
         };
@@ -120,6 +122,8 @@ async function rechargeBalance(userId, amount) {
                 transaction.set(userRef, {
                     balance: newBalance,
                     isAdmin: false,
+                    isDriver: false,
+                    role: 'user',
                     createdAt: getTimestamp()
                 });
 

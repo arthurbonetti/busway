@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         if (!session) {
             showNotification('Sessão expirada. Redirecionando para login...', 'error');
             setTimeout(() => {
-                window.location.href = 'index.html';
+                window.location.href = '../../index.html';
             }, 1500);
             return null;
         }

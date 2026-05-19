@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const session = sessionStorage.getItem('buswaySession');
     if (!session) {
         alert('Você precisa estar logado');
-        window.location.href = 'index.html';
+        window.location.href = '../../index.html';
         return;
     }
 
@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (!sessionData.isAdmin) {
         alert('Acesso negado. Apenas administradores.');
-        window.location.href = 'user-dashboard.html';
+        window.location.href = '../user/user-dashboard.html';
         return;
     }
 
@@ -550,7 +550,7 @@ function initSettingsTab() {
 
 function logout() {
     sessionStorage.removeItem('buswaySession');
-    window.location.href = 'landing.html';
+    window.location.href = '../public/landing.html';
 }
 
 // ========================================
@@ -1009,8 +1009,9 @@ async function loadUsersForAdmin() {
             } else {
                 usersTableBody.innerHTML = allUsers.map(user => {
                     const createdDate = user.createdAt?.toDate?.() || new Date();
-                    const userType = user.isAdmin ? 'Admin' : 'Usuário';
-                    const typeClass = user.isAdmin ? 'admin' : 'user';
+                    const isDriver = user.isDriver || user.role === 'driver';
+                    const userType = user.isAdmin ? 'Admin' : (isDriver ? 'Motorista' : 'Usuário');
+                    const typeClass = user.isAdmin ? 'admin' : (isDriver ? 'driver' : 'user');
 
                     return `
                         <tr>
@@ -1059,6 +1060,7 @@ function openEditUserModal(userId) {
     // Preencher formulário
     document.getElementById('editUserName').value = user.name || '';
     document.getElementById('editUserEmail').value = user.email || '';
+    document.getElementById('editUserRole').value = user.isAdmin ? 'admin' : ((user.isDriver || user.role === 'driver') ? 'driver' : 'user');
 
     // Mostrar modal
     document.getElementById('editUserModal').classList.add('show');
@@ -1079,6 +1081,7 @@ async function handleEditUserSubmit(e) {
 
     const name = document.getElementById('editUserName').value.trim();
     const email = document.getElementById('editUserEmail').value.trim();
+    const role = document.getElementById('editUserRole').value;
 
     if (!name || !email) {
         showToast('Preencha todos os campos', 'error');
@@ -1089,6 +1092,9 @@ async function handleEditUserSubmit(e) {
         await db.collection('users').doc(editingUserId).update({
             name: name,
             email: email,
+            role: role,
+            isAdmin: role === 'admin',
+            isDriver: role === 'driver',
             updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         });
 

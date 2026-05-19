@@ -12,6 +12,7 @@ let currentUserId = null;
 let tripUnsubscriber = null;
 let tripFeedbackPopupReady = false;
 let latestCompletedTripDetail = null;
+let isUsingDriverLiveLocation = false;
 
 // Ícones personalizados
 const busIcon = L.icon({
@@ -47,7 +48,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const session = loadUserSession();
     if (!session) {
         alert('Sessão expirada');
-        window.location.href = 'index.html';
+        window.location.href = '../../index.html';
         return;
     }
 
@@ -225,13 +226,21 @@ function initMap() {
         ).addTo(map).bindPopup(`🔴 Destino: ${activeTripData.destination}`);
     }
 
-    // Iniciar simulador de ônibus
-    startBusSimulator();
 }
 
 // ========== SIMULADOR DE ÔNIBUS ==========
 
 function startBusSimulator() {
+    if (busSimulator && busSimulator.isRunning) {
+        return;
+    }
+
+    if (busSimulator && !busSimulator.isRunning) {
+        console.log('[startBusSimulator] Retomando simulador existente');
+        busSimulator.start();
+        return;
+    }
+
     console.log('[startBusSimulator] Iniciando simulador');
 
     if (!activeTripData || !activeTripData.id) {
@@ -270,6 +279,79 @@ function startBusSimulator() {
     busSimulator.start();
 }
 
+function stopBusSimulator() {
+    if (busSimulator && busSimulator.isRunning) {
+        console.log('[stopBusSimulator] Parando simulador (GPS real ativo)');
+        busSimulator.stop();
+    }
+}
+
+function extractBusLocation(busLocation) {
+    if (!busLocation || typeof busLocation.lat !== 'number') {
+        return null;
+    }
+
+    const lon = typeof busLocation.lon === 'number' ? busLocation.lon : busLocation.lng;
+    if (typeof lon !== 'number') {
+        return null;
+    }
+
+    return {
+        lat: busLocation.lat,
+        lon,
+        speed: busLocation.speed,
+        heading: busLocation.heading,
+        timestamp: busLocation.timestamp || null
+    };
+}
+
+function isDriverLiveTrackingActive(data) {
+    const liveTracking = data?.liveTracking;
+    if (!liveTracking || !liveTracking.enabled || liveTracking.source !== 'driver') {
+        return false;
+    }
+
+    const lastGpsAt = liveTracking.lastGpsAt;
+    const lastGpsMillis = lastGpsAt?.toMillis ? lastGpsAt.toMillis() : null;
+
+    if (!lastGpsMillis) {
+        return true;
+    }
+
+    const stalenessMs = Date.now() - lastGpsMillis;
+    return stalenessMs <= 45000;
+}
+
+function updateGpsTelemetry(data, normalizedBusLocation, driverLiveActive) {
+    const gpsSourceEl = document.getElementById('gpsSource');
+    const gpsMetaEl = document.getElementById('gpsMeta');
+    if (!gpsSourceEl || !gpsMetaEl) return;
+
+    if (!normalizedBusLocation) {
+        gpsSourceEl.textContent = 'GPS: sem dados';
+        gpsMetaEl.textContent = '--';
+        return;
+    }
+
+    const sourceText = driverLiveActive ? 'GPS: celular do motorista (real)' : 'GPS: simulador';
+    gpsSourceEl.textContent = sourceText;
+
+    const timestamp = normalizedBusLocation.deviceTimestamp
+        ? new Date(normalizedBusLocation.deviceTimestamp)
+        : (normalizedBusLocation.timestamp?.toDate
+        ? normalizedBusLocation.timestamp.toDate()
+        : null);
+    const timeText = timestamp ? timestamp.toLocaleTimeString('pt-BR') : 'agora';
+    const accuracyText = typeof normalizedBusLocation.accuracy === 'number'
+        ? `${Math.round(normalizedBusLocation.accuracy)}m`
+        : 'n/d';
+    const speedMs = typeof normalizedBusLocation.speed === 'number' ? normalizedBusLocation.speed : null;
+    const speedKmh = speedMs !== null ? Math.max(0, speedMs * 3.6).toFixed(1) : null;
+    const speedText = speedKmh !== null ? `${speedKmh} km/h` : 'n/d';
+
+    gpsMetaEl.textContent = `Atualizado: ${timeText} | Precisao: ${accuracyText} | Velocidade: ${speedText}`;
+}
+
 // ========== LISTENER EM TEMPO REAL ==========
 
 function setupRealtimeListener() {
@@ -294,13 +376,34 @@ function setupRealtimeListener() {
             // Atualizar status
             updateStatus(data.status);
 
+            const driverLiveActive = isDriverLiveTrackingActive(data);
+
+            if (driverLiveActive) {
+                if (!isUsingDriverLiveLocation) {
+                    console.log('[Listener] GPS real do motorista detectado. Desativando simulador local.');
+                }
+                isUsingDriverLiveLocation = true;
+                stopBusSimulator();
+            } else {
+                if (isUsingDriverLiveLocation) {
+                    console.log('[Listener] GPS real inativo. Retornando para simulador.');
+                }
+                isUsingDriverLiveLocation = false;
+
+                if (!busSimulator || !busSimulator.isRunning) {
+                    startBusSimulator();
+                }
+            }
+
             // Atualizar posição do ônibus
-            if (data.busLocation) {
-                updateBusMarker(data.busLocation.lat, data.busLocation.lon);
+            const normalizedBusLocation = extractBusLocation(data.busLocation);
+            updateGpsTelemetry(data, normalizedBusLocation, driverLiveActive);
+            if (normalizedBusLocation) {
+                updateBusMarker(normalizedBusLocation.lat, normalizedBusLocation.lon);
 
                 // Calcular distância e ETA
                 if (activeTripData.originCoords) {
-                    updateDistanceAndETA(data.busLocation);
+                    updateDistanceAndETA(normalizedBusLocation);
                 }
             }
         }, (error) => {

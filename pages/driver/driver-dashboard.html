@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel do Motorista | Busway</title>
+    <link rel="stylesheet" href="driver-dashboard.css">
+    <link rel="stylesheet" href="../../styles/global/dark-mode.css">
+</head>
+<body>
+    <header class="header">
+        <div>
+            <h1>Painel do Motorista</h1>
+            <p id="driverWelcome">Bem-vindo(a) ao painel.</p>
+        </div>
+        <div class="header-actions">
+            <button class="btn secondary" onclick="window.location.href='../public/mobile-gps-setup.html'">Guia HTTPS Celular</button>
+            <button class="btn secondary" onclick="window.location.href='driver-live-location.html'">Abrir GPS</button>
+            <button class="btn danger" id="logoutBtn">Sair</button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <section class="grid">
+            <article class="card">
+                <h2>Viagens ativas</h2>
+                <div class="big-number" id="activeTripsCount">0</div>
+                <p>Quantidade de viagens disponíveis para transmissão.</p>
+            </article>
+            <article class="card">
+                <h2>GPS em tempo real</h2>
+                <div class="big-number" id="liveTripsCount">0</div>
+                <p>Viagens atualmente com GPS real ativo.</p>
+            </article>
+        </section>
+
+        <section class="card list-card">
+            <div class="list-header">
+                <h2>Viagens em aberto</h2>
+                <button class="btn secondary" id="refreshBtn">Atualizar</button>
+            </div>
+            <div id="tripsList" class="trips-list"></div>
+            <p id="emptyState" class="empty">Nenhuma viagem ativa no momento.</p>
+        </section>
+    </main>
+
+    <div class="notification" id="notification"></div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="../../firebase-config.js"></script>
+    <script src="../../js/services/firestore-service.js"></script>
+    <script src="../../js/utilities/dark-mode-global.js"></script>
+    <script src="driver-dashboard.js"></script>
+</body>
+</html>

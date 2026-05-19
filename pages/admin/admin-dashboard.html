@@ -448,6 +448,11 @@
             color: #22543d;
         }
 
+        .badge.driver {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
         /* CONFIGURAÇÕES TAB */
         .settings-container {
             padding: 24px;
@@ -1254,6 +1259,14 @@
                 <div class="modal-form-group">
                     <label class="modal-form-label">Email</label>
                     <input type="email" id="editUserEmail" class="modal-form-input" required>
+                </div>
+                <div class="modal-form-group">
+                    <label class="modal-form-label">Tipo de usuário</label>
+                    <select id="editUserRole" class="modal-form-input" required>
+                        <option value="user">Usuário</option>
+                        <option value="driver">Motorista</option>
+                        <option value="admin">Admin</option>
+                    </select>
                 </div>
                 <div class="modal-actions">
                     <button type="button" class="modal-btn modal-btn-cancel" onclick="closeEditUserModal()">Cancelar</button>

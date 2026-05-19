@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GPS em Tempo Real | Motorista Busway</title>
+    <link rel="stylesheet" href="driver-live-location.css">
+    <link rel="stylesheet" href="../../styles/global/dark-mode.css">
+</head>
+<body>
+    <header class="header">
+        <div class="header-left">
+            <button class="back-btn" onclick="window.location.href='driver-dashboard.html'" title="Voltar">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                </svg>
+            </button>
+            <div>
+                <h1>Transmissao GPS</h1>
+                <p>Selecione uma viagem ativa e envie a localizacao real do celular.</p>
+            </div>
+        </div>
+        <span class="pill" id="sharingStatus">Inativo</span>
+    </header>
+
+    <main class="main-content">
+        <section class="panel">
+            <div class="panel-title-row">
+                <h2>Viagens ativas</h2>
+                <button id="refreshTripsBtn" class="btn secondary">Atualizar</button>
+            </div>
+            <div id="tripsList" class="trips-list"></div>
+            <p id="tripsEmpty" class="empty">Nenhuma viagem ativa encontrada.</p>
+        </section>
+
+        <section class="panel controls">
+            <h2>Controle de transmissao</h2>
+            <p id="selectedTripLabel" class="muted">Selecione uma viagem para iniciar.</p>
+            <div class="actions">
+                <button id="startSharingBtn" class="btn primary" disabled>Iniciar GPS real</button>
+                <button id="stopSharingBtn" class="btn danger" disabled>Parar GPS</button>
+            </div>
+            <div class="gps-card">
+                <div class="gps-card-title">Leitura do dispositivo</div>
+                <div id="gpsInfo" class="gps-info">Sem leitura ainda.</div>
+            </div>
+        </section>
+    </main>
+
+    <div class="notification" id="notification"></div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="../../firebase-config.js"></script>
+    <script src="../../js/services/firestore-service.js"></script>
+    <script src="../../js/utilities/dark-mode-global.js"></script>
+    <script src="driver-live-location.js"></script>
+</body>
+</html>

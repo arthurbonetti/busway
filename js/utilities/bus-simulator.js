@@ -1,4 +1,4 @@
-const TEST_MODE = true;
+const TEST_MODE = false;
 
 class BusSimulator {
     constructor(activeTripId, routePath, speed = 40, preRoutePath = null) {
@@ -62,6 +62,16 @@ class BusSimulator {
      * Calcula nova posição e atualiza no Firestore
      */
     async updatePosition() {
+        const tripDoc = await db.collection('active_trips').doc(this.activeTripId).get();
+        const liveTracking = tripDoc.exists ? (tripDoc.data().liveTracking || null) : null;
+        const isDriverTracking = !!(liveTracking && liveTracking.enabled && liveTracking.source === 'driver');
+
+        if (isDriverTracking) {
+            console.log('[BusSimulator] GPS real ativo. Simulador pausado para evitar conflito.');
+            this.stop();
+            return;
+        }
+
         // 🧪 MODO DE TESTE: Viagem simplificada
         if (this.testModeEnabled) {
             return await this.updatePositionTestMode();

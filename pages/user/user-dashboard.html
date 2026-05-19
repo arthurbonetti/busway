@@ -78,7 +78,7 @@
                 </div>
                 <h3>Feedbacks</h3>
                 <p>Envie sua opinião e acompanhe respostas da equipe</p>
-                <button class="feature-btn" onclick="switchDashboardTab('feedback')">Abrir Feedbacks</button>
+                <button class="feature-btn" onclick="window.location.href='user-feedbacks.html'">Abrir Feedbacks</button>
             </div>
 
             <div class="feature-card">
@@ -126,32 +126,6 @@
                     </div>
                 </div>
             </div>
-        </div>
-
-        <div id="feedbackDashboardTab" class="dashboard-tab-content">
-            <section class="feedback-dashboard-section">
-                <div class="feedback-dashboard-card">
-                    <h3>Enviar Feedback</h3>
-                    <p>Conte para a equipe o que pode melhorar no Busway.</p>
-                    <textarea
-                        id="dashboardFeedbackText"
-                        class="dashboard-feedback-textarea"
-                        maxlength="500"
-                        placeholder="Escreva aqui seu feedback..."
-                    ></textarea>
-                    <div class="dashboard-feedback-footer">
-                        <span id="dashboardFeedbackCharCount" class="dashboard-feedback-charcount">0/500</span>
-                        <button class="feature-btn feedback-submit-btn" onclick="submitDashboardFeedback()">Enviar</button>
-                    </div>
-                </div>
-
-                <div class="feedback-dashboard-card">
-                    <h3>Meus Feedbacks</h3>
-                    <p>Acompanhe respostas da equipe para seus envios.</p>
-                    <div id="dashboardFeedbackList" class="dashboard-feedback-list"></div>
-                    <div id="dashboardFeedbackEmpty" class="dashboard-feedback-empty">Nenhum feedback enviado ainda.</div>
-                </div>
-            </section>
         </div>
     </main>
 

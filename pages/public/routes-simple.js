@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const session = loadUserSession();
     if (!session) {
         showToast('Você precisa estar logado', 'error');
-        setTimeout(() => window.location.href = 'index.html', 1500);
+        setTimeout(() => window.location.href = '../../index.html', 1500);
         return;
     }
 
@@ -514,6 +514,14 @@ async function confirmTrip() {
             preRoutePath: preRoutePath,
             preRouteDuration: preRouteDuration,
             preRouteDistance: preRouteDistance,
+
+            liveTracking: {
+                enabled: false,
+                source: 'simulator',
+                driverId: null,
+                driverName: null,
+                lastGpsAt: null
+            },
 
             status: 'approaching_origin', // Novo status
             createdAt: firebase.firestore.FieldValue.serverTimestamp(),
