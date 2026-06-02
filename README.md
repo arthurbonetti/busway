@@ -103,15 +103,6 @@ O projeto inclui artefatos de PWA:
 - `manifest.json` para metadados de instalacao.
 - `service-worker.js` para gerenciamento de cache e atualizacao.
 
-Observacao: revise o `start_url` e caminhos de atalhos no manifest para garantir aderencia ao fluxo atual de paginas.
-
-## Boas praticas e seguranca
-
-- Nunca versione credenciais reais do Firebase.
-- Defina regras de seguranca do Firestore por perfil de acesso.
-- Valide permissoes administrativas tanto na interface quanto nas regras do backend.
-- Mantenha colecoes e campos padronizados para evitar inconsistencias entre modulos.
-
 ## Autores
 
 - Arthur Bonetti
