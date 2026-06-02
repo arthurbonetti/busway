@@ -11,7 +11,6 @@ Sistema web de transporte publico com autenticacao, acompanhamento de rotas, pai
 - [Fluxo de autenticacao e perfis](#fluxo-de-autenticacao-e-perfis)
 - [Colecoes esperadas no Firestore](#colecoes-esperadas-no-firestore)
 - [PWA e funcionamento offline](#pwa-e-funcionamento-offline)
-- [Boas praticas e seguranca](#boas-praticas-e-seguranca)
 - [Autores](#autores)
 
 ## Visao geral
