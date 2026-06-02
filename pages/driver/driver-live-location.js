@@ -5,6 +5,234 @@ let currentSession = null;
 let lastSentPoint = null;
 let lastSentAt = 0;
 let lastCapturedPoint = null;
+let presenceIntervalId = null;
+let selectedAssignedRoute = null;
+
+function normalizeRouteValueList(value) {
+    if (Array.isArray(value)) {
+        return value
+            .map((item) => String(item || '').trim())
+            .filter(Boolean);
+    }
+
+    if (typeof value === 'string') {
+        return value
+            .split(/[;,|]/)
+            .map((item) => String(item || '').trim())
+            .filter(Boolean);
+    }
+
+    return [];
+}
+
+function formatRouteLabel(routeNumber, routeName) {
+    if (routeNumber) {
+        return `Linha ${routeNumber}${routeName ? ` - ${routeName}` : ''}`;
+    }
+    return routeName || 'Rota designada';
+}
+
+function getAssignedRoutesFromSession() {
+    const sessionRoutes = [];
+
+    const routesFromList = Array.isArray(currentSession?.assignedRoutes) ? currentSession.assignedRoutes : [];
+    routesFromList.forEach((route) => {
+        const normalized = {
+            id: String(route?.id || '').trim() || null,
+            number: String(route?.number || '').trim() || null,
+            name: String(route?.name || '').trim() || null
+        };
+
+        if (normalized.id || normalized.number || normalized.name) {
+            sessionRoutes.push(normalized);
+        }
+    });
+
+    const ids = normalizeRouteValueList(currentSession?.assignedRouteIds);
+    const numbers = normalizeRouteValueList(currentSession?.assignedRouteNumbers);
+    const names = normalizeRouteValueList(currentSession?.assignedRouteNames);
+
+    const maxLength = Math.max(ids.length, numbers.length, names.length);
+    for (let index = 0; index < maxLength; index += 1) {
+        const normalized = {
+            id: String(ids[index] || '').trim() || null,
+            number: String(numbers[index] || '').trim() || null,
+            name: String(names[index] || '').trim() || null
+        };
+
+        if (normalized.id || normalized.number || normalized.name) {
+            sessionRoutes.push(normalized);
+        }
+    }
+
+    const legacy = {
+        id: String(currentSession?.assignedRouteId || '').trim() || null,
+        number: String(currentSession?.assignedRouteNumber || '').trim() || null,
+        name: String(currentSession?.assignedRouteName || '').trim() || null
+    };
+
+    if (legacy.id || legacy.number || legacy.name) {
+        sessionRoutes.push(legacy);
+    }
+
+    const uniqueKeys = new Set();
+    const deduped = [];
+
+    sessionRoutes.forEach((route) => {
+        const key = `${route.id || ''}|${(route.number || '').toLowerCase()}|${(route.name || '').toLowerCase()}`;
+        if (uniqueKeys.has(key)) return;
+        uniqueKeys.add(key);
+        deduped.push(route);
+    });
+
+    return deduped;
+}
+
+function getAssignedRouteTarget() {
+    const primaryRoute = selectedAssignedRoute || getAssignedRoutesFromSession()[0] || null;
+
+    if (!primaryRoute || (!primaryRoute.id && !primaryRoute.number)) {
+        return null;
+    }
+
+    return {
+        mode: 'route',
+        routeId: primaryRoute.id || null,
+        routeNumber: primaryRoute.number || null,
+        routeName: primaryRoute.name || null
+    };
+}
+
+function getTrackingTarget() {
+    if (selectedTripId && selectedTripData) {
+        return {
+            mode: 'trip',
+            tripId: selectedTripId,
+            routeId: String(selectedTripData.routeId || '').trim() || null,
+            routeNumber: String(selectedTripData.routeNumber || '').trim() || null,
+            routeName: String(selectedTripData.routeName || '').trim() || null
+        };
+    }
+
+    return getAssignedRouteTarget();
+}
+
+function getRouteTargetFromQuery() {
+    const params = new URLSearchParams(window.location.search);
+    const routeId = String(params.get('routeId') || '').trim();
+    const routeNumber = String(params.get('routeNumber') || '').trim();
+    const routeName = String(params.get('routeName') || '').trim();
+
+    if (!routeId && !routeNumber && !routeName) {
+        return null;
+    }
+
+    return {
+        id: routeId || null,
+        number: routeNumber || null,
+        name: routeName || null
+    };
+}
+
+function resolveSelectedAssignedRoute() {
+    const queryRoute = getRouteTargetFromQuery();
+    if (!queryRoute) {
+        selectedAssignedRoute = null;
+        return;
+    }
+
+    const assignedRoutes = getAssignedRoutesFromSession();
+
+    const matchedById = queryRoute.id
+        ? assignedRoutes.find((route) => String(route.id || '').trim() === queryRoute.id)
+        : null;
+
+    if (matchedById) {
+        selectedAssignedRoute = matchedById;
+        return;
+    }
+
+    const queryRouteNumber = String(queryRoute.number || '').trim().toLowerCase();
+    const matchedByNumber = queryRouteNumber
+        ? assignedRoutes.find((route) => String(route.number || '').trim().toLowerCase() === queryRouteNumber)
+        : null;
+
+    if (matchedByNumber) {
+        selectedAssignedRoute = matchedByNumber;
+        return;
+    }
+
+    selectedAssignedRoute = null;
+}
+
+function updateSelectionLabel() {
+    const target = getTrackingTarget();
+
+    if (!target) {
+        selectedTripLabel.textContent = 'Selecione uma viagem para iniciar.';
+        return;
+    }
+
+    if (target.mode === 'trip') {
+        selectedTripLabel.textContent = `Selecionado: ${formatRouteLabel(target.routeNumber, target.routeName)} (${target.tripId})`;
+        return;
+    }
+
+    selectedTripLabel.textContent = `Selecionado: ${formatRouteLabel(target.routeNumber, target.routeName)} (rota designada)`;
+}
+
+function getSessionUserId() {
+    return currentSession?.uid || currentSession?.id || null;
+}
+
+async function refreshDriverProfile() {
+    const userId = getSessionUserId();
+    if (!userId) return;
+
+    try {
+        const doc = await db.collection('users').doc(userId).get();
+        if (!doc.exists) return;
+
+        const data = doc.data() || {};
+        currentSession = {
+            ...currentSession,
+            ...data,
+            uid: currentSession.uid || currentSession.id || userId,
+            id: currentSession.id || currentSession.uid || userId
+        };
+
+        sessionStorage.setItem('buswaySession', JSON.stringify(currentSession));
+    } catch (error) {
+        console.warn('[driver-live-location] Falha ao atualizar perfil do motorista:', error);
+    }
+}
+
+function isTripAllowedForAssignedRoute(trip) {
+    const assignedRoutes = getAssignedRoutesFromSession();
+    const assignedRouteIds = assignedRoutes
+        .map((route) => String(route.id || '').trim())
+        .filter(Boolean);
+    const assignedRouteNumbers = assignedRoutes
+        .map((route) => String(route.number || '').trim().toLowerCase())
+        .filter(Boolean);
+
+    if (!assignedRouteIds.length && !assignedRouteNumbers.length) {
+        return true;
+    }
+
+    const tripRouteId = String(trip.routeId || '').trim();
+    const tripRouteNumber = String(trip.routeNumber || '').trim().toLowerCase();
+
+    if (tripRouteId && assignedRouteIds.includes(tripRouteId)) {
+        return true;
+    }
+
+    if (tripRouteNumber && assignedRouteNumbers.includes(tripRouteNumber)) {
+        return true;
+    }
+
+    return false;
+}
 
 const MIN_SEND_INTERVAL_MS = 4000;
 const MIN_MOVE_METERS = 12;
@@ -25,6 +253,23 @@ function showNotification(message) {
     setTimeout(() => {
         notification.className = 'notification';
     }, 2800);
+}
+
+async function updateDriverPresence(isOnline) {
+    const userId = getSessionUserId();
+    if (!userId) return;
+
+    try {
+        await db.collection('users').doc(userId).set({
+            isOnline,
+            isLoggedIn: isOnline,
+            lastActive: firebase.firestore.FieldValue.serverTimestamp(),
+            lastActiveAt: firebase.firestore.FieldValue.serverTimestamp(),
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+    } catch (error) {
+        console.warn('[driver-live-location] Falha ao atualizar presença do motorista:', error);
+    }
 }
 
 function loadSession() {
@@ -109,7 +354,7 @@ function updateGpsDisplay(showSendTime = false) {
     const latText = `Lat: ${lastCapturedPoint.lat.toFixed(6)}`;
     const lngText = `Lng: ${lastCapturedPoint.lon.toFixed(6)}`;
     const accuracyText = `Precisao: ${Math.round(lastCapturedPoint.accuracy || 0)}m`;
-    
+
     if (showSendTime) {
         const sendTime = `Ultimo envio: ${new Date().toLocaleTimeString('pt-BR')}`;
         gpsInfo.textContent = `${latText} | ${lngText} | ${accuracyText} | ${sendTime}`;
@@ -130,8 +375,13 @@ function isTripAssignedToCurrentDriver(trip) {
     const sessionName = String(currentSession.name || '').trim().toLowerCase();
     const sessionEmail = String(currentSession.email || '').trim().toLowerCase();
     const tripDriver = String(trip.driver || '').trim().toLowerCase();
+    const tripDriverId = String(trip.driverId || '').trim();
     const trackingDriverId = String(trip.liveTracking?.driverId || '').trim();
     const sessionId = String(currentSession.uid || currentSession.id || '').trim();
+
+    if (tripDriverId && sessionId && tripDriverId === sessionId) {
+        return true;
+    }
 
     if (trackingDriverId && sessionId && trackingDriverId === sessionId) {
         return true;
@@ -145,7 +395,7 @@ function isTripAssignedToCurrentDriver(trip) {
         return true;
     }
 
-    if (!tripDriver) {
+    if (!tripDriver || tripDriver === 'n/a') {
         return true;
     }
 
@@ -153,6 +403,9 @@ function isTripAssignedToCurrentDriver(trip) {
 }
 
 async function loadActiveTrips() {
+    await refreshDriverProfile();
+    await updateDriverPresence(true);
+
     tripsList.innerHTML = '';
     tripsEmpty.style.display = 'none';
 
@@ -161,17 +414,32 @@ async function loadActiveTrips() {
         .get();
 
     if (snapshot.empty) {
+        selectedTripId = null;
+        selectedTripData = null;
+        tripsEmpty.textContent = 'Nenhuma viagem ativa encontrada. Você pode transmitir pela rota designada.';
         tripsEmpty.style.display = 'block';
+        updateSelectionLabel();
+        setSharingUi(watchId !== null);
         return;
     }
 
     let docs = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
     docs = docs.filter((trip) => isTripAssignedToCurrentDriver(trip));
+    docs = docs.filter((trip) => isTripAllowedForAssignedRoute(trip));
 
     if (!docs.length) {
+        selectedTripId = null;
+        selectedTripData = null;
         tripsEmpty.textContent = 'Nenhuma viagem ativa atribuída ao seu usuário de motorista.';
         tripsEmpty.style.display = 'block';
+        updateSelectionLabel();
+        setSharingUi(watchId !== null);
         return;
+    }
+
+    if (!docs.some((trip) => trip.id === selectedTripId)) {
+        selectedTripId = null;
+        selectedTripData = null;
     }
 
     docs.sort((a, b) => {
@@ -207,22 +475,21 @@ async function loadActiveTrips() {
         tripsList.appendChild(card);
     });
 
-    if (selectedTripData) {
-        selectedTripLabel.textContent = `Selecionado: Linha ${selectedTripData.routeNumber || 'N/A'} (${selectedTripId})`;
-        startSharingBtn.disabled = false;
-    }
+    updateSelectionLabel();
+    setSharingUi(watchId !== null);
 }
 
 function selectTrip(tripId, tripData) {
     selectedTripId = tripId;
     selectedTripData = tripData;
-    selectedTripLabel.textContent = `Selecionado: Linha ${tripData.routeNumber || 'N/A'} (${tripId})`;
-    startSharingBtn.disabled = false;
+    updateSelectionLabel();
+    setSharingUi(watchId !== null);
     loadActiveTrips();
 }
 
 async function publishLocation(position) {
-    if (!selectedTripId) return;
+    const trackingTarget = getTrackingTarget();
+    if (!trackingTarget) return;
 
     const point = {
         lat: position.coords.latitude,
@@ -233,38 +500,95 @@ async function publishLocation(position) {
         collectedAt: Date.now()
     };
 
-    // Sempre atualiza o ponto capturado para manter a lat/lon visível
     lastCapturedPoint = point;
-    
-    // Atualiza o display com lat/lon permanente
     updateGpsDisplay();
 
     if (!shouldSend(point)) {
         return;
     }
 
-    await db.collection('active_trips').doc(selectedTripId).update({
-        busLocation: {
-            lat: point.lat,
-            lon: point.lon,
-            speed: point.speed,
-            heading: point.heading,
-            accuracy: point.accuracy,
-            deviceTimestamp: point.collectedAt,
-            timestamp: firebase.firestore.FieldValue.serverTimestamp()
-        },
-        liveTracking: {
-            enabled: true,
-            source: 'driver',
-            driverId: currentSession.uid || currentSession.id || null,
-            driverName: currentSession.name || currentSession.email || 'Motorista',
-            lastGpsAt: firebase.firestore.FieldValue.serverTimestamp()
-        },
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
+    const updates = [];
 
-    // Atualiza o timestamp de envio mantendo a lat/lon visível
+    if (selectedTripId) {
+        updates.push(db.collection('active_trips').doc(selectedTripId).update({
+            busLocation: {
+                lat: point.lat,
+                lon: point.lon,
+                speed: point.speed,
+                heading: point.heading,
+                accuracy: point.accuracy,
+                deviceTimestamp: point.collectedAt,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            },
+            liveTracking: {
+                enabled: true,
+                source: 'driver',
+                driverId: currentSession.uid || currentSession.id || null,
+                driverName: currentSession.name || currentSession.email || 'Motorista',
+                lastGpsAt: firebase.firestore.FieldValue.serverTimestamp()
+            },
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }));
+    }
+
+    if (trackingTarget.routeId) {
+        updates.push(db.collection('routes').doc(trackingTarget.routeId).set({
+            liveLocation: {
+                lat: point.lat,
+                lon: point.lon,
+                speed: point.speed,
+                heading: point.heading,
+                accuracy: point.accuracy,
+                deviceTimestamp: point.collectedAt,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            },
+            liveTracking: {
+                enabled: true,
+                source: 'driver',
+                driverId: currentSession.uid || currentSession.id || null,
+                driverName: currentSession.name || currentSession.email || 'Motorista',
+                routeId: trackingTarget.routeId,
+                routeNumber: trackingTarget.routeNumber || null,
+                routeName: trackingTarget.routeName || null,
+                lastGpsAt: firebase.firestore.FieldValue.serverTimestamp()
+            },
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true }));
+    }
+
+    if (updates.length) {
+        await Promise.all(updates);
+    }
+
     updateGpsDisplay(true);
+}
+
+async function disableNonSelectedAssignedRoutes(activeRouteId) {
+    const routeId = String(activeRouteId || '').trim();
+    if (!routeId) return;
+
+    const assignedRoutes = getAssignedRoutesFromSession();
+    const routesToDisable = assignedRoutes
+        .map((route) => String(route.id || '').trim())
+        .filter((id) => id && id !== routeId);
+
+    if (!routesToDisable.length) {
+        return;
+    }
+
+    await Promise.all(routesToDisable.map((otherRouteId) => (
+        db.collection('routes').doc(otherRouteId).set({
+            liveTracking: {
+                enabled: false,
+                source: 'simulator',
+                driverId: currentSession.uid || currentSession.id || null,
+                driverName: currentSession.name || currentSession.email || 'Motorista',
+                routeId: otherRouteId,
+                lastGpsAt: firebase.firestore.FieldValue.serverTimestamp()
+            },
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true })
+    )));
 }
 
 function handleGeoError(error) {
@@ -279,13 +603,14 @@ function handleGeoError(error) {
 function setSharingUi(active) {
     sharingStatus.textContent = active ? 'GPS ativo' : 'Inativo';
     sharingStatus.className = active ? 'pill live' : 'pill';
-    startSharingBtn.disabled = active || !selectedTripId;
+    startSharingBtn.disabled = active || !getTrackingTarget();
     stopSharingBtn.disabled = !active;
 }
 
 async function startSharing() {
-    if (!selectedTripId || !selectedTripData) {
-        showNotification('Selecione uma viagem antes de iniciar.');
+    const trackingTarget = getTrackingTarget();
+    if (!trackingTarget) {
+        showNotification('Selecione uma viagem ou tenha uma rota designada para iniciar.');
         return;
     }
 
@@ -303,6 +628,10 @@ async function startSharing() {
     if (watchId !== null) {
         showNotification('GPS ja esta ativo.');
         return;
+    }
+
+    if (trackingTarget.routeId) {
+        await disableNonSelectedAssignedRoutes(trackingTarget.routeId);
     }
 
     gpsInfo.textContent = 'Aguardando primeira leitura do GPS do celular...';
@@ -341,8 +670,11 @@ async function stopSharing() {
         watchId = null;
     }
 
+    const trackingTarget = getTrackingTarget();
+    const updates = [];
+
     if (selectedTripId) {
-        await db.collection('active_trips').doc(selectedTripId).update({
+        updates.push(db.collection('active_trips').doc(selectedTripId).update({
             liveTracking: {
                 enabled: false,
                 source: 'simulator',
@@ -351,7 +683,27 @@ async function stopSharing() {
                 lastGpsAt: firebase.firestore.FieldValue.serverTimestamp()
             },
             updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
+        }));
+    }
+
+    if (trackingTarget?.routeId) {
+        updates.push(db.collection('routes').doc(trackingTarget.routeId).set({
+            liveTracking: {
+                enabled: false,
+                source: 'simulator',
+                driverId: currentSession.uid || currentSession.id || null,
+                driverName: currentSession.name || currentSession.email || 'Motorista',
+                routeId: trackingTarget.routeId,
+                routeNumber: trackingTarget.routeNumber || null,
+                routeName: trackingTarget.routeName || null,
+                lastGpsAt: firebase.firestore.FieldValue.serverTimestamp()
+            },
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true }));
+    }
+
+    if (updates.length) {
+        await Promise.all(updates);
     }
 
     setSharingUi(false);
@@ -362,6 +714,17 @@ async function init() {
     currentSession = assertSession();
     if (!currentSession) return;
 
+    await refreshDriverProfile();
+    resolveSelectedAssignedRoute();
+    await updateDriverPresence(true);
+
+    if (presenceIntervalId) {
+        clearInterval(presenceIntervalId);
+    }
+    presenceIntervalId = setInterval(() => {
+        updateDriverPresence(true);
+    }, 30000);
+
     if (!isSecureGpsContext()) {
         gpsInfo.textContent = 'GPS real indisponivel neste contexto. Abra via HTTPS ou localhost para testar no celular.';
         showNotification('Abra via HTTPS/localhost para usar GPS real.');
@@ -369,6 +732,8 @@ async function init() {
 
     setSharingUi(false);
     await loadActiveTrips();
+    updateSelectionLabel();
+    setSharingUi(false);
 
     refreshTripsBtn.addEventListener('click', loadActiveTrips);
     startSharingBtn.addEventListener('click', startSharing);

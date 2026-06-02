@@ -8,6 +8,10 @@ let filteredRoutes = [];
 let modalMap = null;
 let modalRouteLine = null;
 let selectedRoute = null;
+let assignedDriversByRouteId = new Map();
+
+const DRIVER_ACTIVE_TIMEOUT_MINUTES = 15;
+const LIVE_ROUTE_GPS_TIMEOUT_MS = 60000;
 
 // ========== INICIALIZAÇÃO ==========
 
@@ -60,6 +64,8 @@ async function loadRoutes() {
     try {
         console.log('[routes-simple] Buscando rotas...');
 
+        await loadAssignedDriversMap();
+
         // Buscar todas as rotas ativas
         const snapshot = await db.collection('routes')
             .where('active', '==', true)
@@ -84,11 +90,20 @@ async function loadRoutes() {
         // Montar array de rotas
         allRoutes = [];
         snapshot.forEach(doc => {
-            allRoutes.push({
+            const routeData = {
                 id: doc.id,
                 ...doc.data()
+            };
+
+            const assignment = getRouteAssignmentInfo(routeData);
+
+            allRoutes.push({
+                ...routeData,
+                ...assignment
             });
         });
+
+        allRoutes = allRoutes.filter((route) => route.hasAssignedDriver);
 
         console.log('[routes-simple] Rotas carregadas:', allRoutes.length);
 
@@ -111,6 +126,116 @@ async function loadRoutes() {
             </div>
         `;
     }
+}
+
+async function loadAssignedDriversMap() {
+    assignedDriversByRouteId = new Map();
+
+    try {
+        const driversSnapshot = await db.collection('users')
+            .where('role', '==', 'driver')
+            .get();
+
+        const now = Date.now();
+
+        driversSnapshot.forEach((doc) => {
+            const driverData = doc.data() || {};
+            const assignedRouteIds = Array.from(new Set(
+                [
+                    ...(Array.isArray(driverData.assignedRouteIds) ? driverData.assignedRouteIds : []),
+                    driverData.assignedRouteId
+                ]
+                    .map((value) => String(value || '').trim())
+                    .filter(Boolean)
+            ));
+
+            const assignedRouteNumbers = Array.from(new Set(
+                [
+                    ...(Array.isArray(driverData.assignedRouteNumbers) ? driverData.assignedRouteNumbers : []),
+                    driverData.assignedRouteNumber
+                ]
+                    .map((value) => String(value || '').trim())
+                    .filter(Boolean)
+            ));
+
+            if (!assignedRouteIds.length && !assignedRouteNumbers.length) {
+                return;
+            }
+
+            const lastActiveMillis =
+                driverData.lastActive?.toMillis?.() ||
+                driverData.lastActiveAt?.toMillis?.() ||
+                0;
+
+            const minutesInactive = lastActiveMillis
+                ? (now - lastActiveMillis) / (1000 * 60)
+                : Number.POSITIVE_INFINITY;
+
+            const isActive = driverData.isOnline !== false && minutesInactive < DRIVER_ACTIVE_TIMEOUT_MINUTES;
+
+            const driverInfo = {
+                id: doc.id,
+                name: driverData.name || driverData.email || 'Motorista',
+                assignedRouteIds,
+                assignedRouteNumbers,
+                isActive
+            };
+
+            assignedRouteIds.forEach((routeId) => {
+                const currentList = assignedDriversByRouteId.get(routeId) || [];
+                currentList.push(driverInfo);
+                assignedDriversByRouteId.set(routeId, currentList);
+            });
+        });
+    } catch (error) {
+        console.error('[loadAssignedDriversMap] Erro ao buscar motoristas:', error);
+    }
+}
+
+function getRouteAssignmentInfo(route) {
+    const routeIdKey = String(route.id || '').trim();
+    const routeNumberKey = String(route.number || '').trim();
+
+    let assignedDrivers = assignedDriversByRouteId.get(routeIdKey) || [];
+
+    // Compatibilidade com dados antigos: routeId ausente e vínculo apenas por número.
+    if (!assignedDrivers.length && routeNumberKey) {
+        assignedDrivers = [];
+        assignedDriversByRouteId.forEach((drivers) => {
+            drivers.forEach((driver) => {
+                const hasMatchingNumber = (Array.isArray(driver.assignedRouteNumbers) ? driver.assignedRouteNumbers : [])
+                    .map((number) => String(number || '').trim())
+                    .includes(routeNumberKey);
+
+                if (hasMatchingNumber) {
+                    assignedDrivers.push(driver);
+                }
+            });
+        });
+    }
+
+    const hasAssignedDriver = assignedDrivers.length > 0;
+    const trackingInfo = route.liveTracking || {};
+    const trackingRouteId = String(trackingInfo.routeId || '').trim();
+    const isMatchingTrackingRoute = !trackingRouteId || trackingRouteId === routeIdKey;
+
+    const liveTimestamp =
+        route.liveTracking?.lastGpsAt?.toMillis?.() ||
+        route.liveLocation?.timestamp?.toMillis?.() ||
+        0;
+
+    const isFreshLiveGps = liveTimestamp > 0 && (Date.now() - liveTimestamp) <= LIVE_ROUTE_GPS_TIMEOUT_MS;
+    const hasActiveDriver = hasAssignedDriver
+        && trackingInfo.enabled === true
+        && trackingInfo.source === 'driver'
+        && isMatchingTrackingRoute
+        && isFreshLiveGps;
+
+    return {
+        assignedDrivers,
+        hasAssignedDriver,
+        hasActiveDriver
+    };
 }
 
 // ========== EXIBIR ROTAS ==========
@@ -146,6 +271,12 @@ function displayRoutes(routes) {
                 </div>
             </div>
 
+            <div class="driver-status ${route.hasActiveDriver ? 'active' : 'inactive'}">
+                ${route.hasActiveDriver
+                    ? 'GPS ativo nesta rota'
+                    : 'Sem GPS ativo nesta rota'}
+            </div>
+
             <div class="route-metrics">
                 <div class="metric">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -174,11 +305,16 @@ function handleSearch(e) {
         filteredRoutes = [...allRoutes];
     } else {
         filteredRoutes = allRoutes.filter(route => {
+            const routeNumber = String(route.number || '').toLowerCase();
+            const routeName = String(route.name || '').toLowerCase();
+            const routeOrigin = String(route.origin || '').toLowerCase();
+            const routeDestination = String(route.destination || '').toLowerCase();
+
             return (
-                route.number.toLowerCase().includes(query) ||
-                route.name.toLowerCase().includes(query) ||
-                route.origin.toLowerCase().includes(query) ||
-                route.destination.toLowerCase().includes(query)
+                routeNumber.includes(query) ||
+                routeName.includes(query) ||
+                routeOrigin.includes(query) ||
+                routeDestination.includes(query)
             );
         });
     }
@@ -196,6 +332,11 @@ function selectRoute(routeId) {
     const route = allRoutes.find(r => r.id === routeId);
     if (!route) {
         showToast('Rota não encontrada', 'error');
+        return;
+    }
+
+    if (!route.hasActiveDriver) {
+        showToast('Esta rota não está com GPS ativo no momento', 'error');
         return;
     }
 
@@ -450,9 +591,18 @@ async function confirmTrip() {
         return;
     }
 
+    if (!selectedRoute.hasActiveDriver) {
+        showToast('Não é possível comprar: esta rota não está com GPS ativo', 'error');
+        return;
+    }
+
     console.log('[confirmTrip] Confirmando viagem:', selectedRoute.id);
 
     try {
+        const preferredDriver = (selectedRoute.assignedDrivers || []).find((driver) => driver.isActive)
+            || (selectedRoute.assignedDrivers || [])[0]
+            || null;
+
         // Cancelar viagens ativas antes de criar nova
         await cancelActiveTrips();
 
@@ -507,7 +657,8 @@ async function confirmTrip() {
             duration: selectedRoute.duration,
             distance: selectedRoute.distance,
             path: selectedRoute.path || [],
-            driver: selectedRoute.driver || 'N/A',
+            driver: preferredDriver?.name || selectedRoute.driver || 'Motorista',
+            driverId: preferredDriver?.id || null,
 
             // Informações do trajeto até a origem
             busStartLocation: busStartLocation,
@@ -518,8 +669,8 @@ async function confirmTrip() {
             liveTracking: {
                 enabled: false,
                 source: 'simulator',
-                driverId: null,
-                driverName: null,
+                driverId: preferredDriver?.id || null,
+                driverName: preferredDriver?.name || null,
                 lastGpsAt: null
             },
 

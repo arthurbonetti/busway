@@ -23,7 +23,6 @@
         </div>
 
         <div class="auth-container">
-            <!-- Login Panel -->
             <div class="auth-panel login-panel">
                 <h2>Bem-vindo de volta</h2>
                 <p class="panel-subtitle">Acesse sua conta agora mesmo</p>
@@ -47,7 +46,6 @@
                 </button>
             </div>
 
-            <!-- Register Panel -->
             <div class="auth-panel register-panel">
                 <h2>Crie sua conta</h2>
                 <p class="panel-subtitle">Cadastre seus dados</p>
@@ -78,17 +76,14 @@
 
     <div class="notification" id="notification"></div>
 
-    <!-- Firebase v8 SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
-    <!-- Configuração e serviços -->
     <script src="firebase-config.js"></script>
     <script src="js/services/firestore-service.js"></script>
     <script src="js/script.js"></script>
 
-    <!-- PWA Service Worker -->
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {

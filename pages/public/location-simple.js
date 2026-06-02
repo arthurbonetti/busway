@@ -10,6 +10,7 @@ let activeTripData = null;
 let busSimulator = null;
 let currentUserId = null;
 let tripUnsubscriber = null;
+let routeUnsubscriber = null;
 let tripFeedbackPopupReady = false;
 let latestCompletedTripDetail = null;
 let isUsingDriverLiveLocation = false;
@@ -305,8 +306,47 @@ function extractBusLocation(busLocation) {
     };
 }
 
+function extractRouteLiveLocation(routeData) {
+    const liveLocation = routeData?.liveLocation;
+    if (!liveLocation || typeof liveLocation.lat !== 'number') {
+        return null;
+    }
+
+    const lon = typeof liveLocation.lon === 'number' ? liveLocation.lon : liveLocation.lng;
+    if (typeof lon !== 'number') {
+        return null;
+    }
+
+    return {
+        lat: liveLocation.lat,
+        lon,
+        speed: liveLocation.speed,
+        heading: liveLocation.heading,
+        accuracy: liveLocation.accuracy,
+        deviceTimestamp: liveLocation.deviceTimestamp,
+        timestamp: liveLocation.timestamp || null
+    };
+}
+
 function isDriverLiveTrackingActive(data) {
     const liveTracking = data?.liveTracking;
+    if (!liveTracking || !liveTracking.enabled || liveTracking.source !== 'driver') {
+        return false;
+    }
+
+    const lastGpsAt = liveTracking.lastGpsAt;
+    const lastGpsMillis = lastGpsAt?.toMillis ? lastGpsAt.toMillis() : null;
+
+    if (!lastGpsMillis) {
+        return true;
+    }
+
+    const stalenessMs = Date.now() - lastGpsMillis;
+    return stalenessMs <= 45000;
+}
+
+function isRouteLiveTrackingActive(routeData) {
+    const liveTracking = routeData?.liveTracking;
     if (!liveTracking || !liveTracking.enabled || liveTracking.source !== 'driver') {
         return false;
     }
@@ -359,6 +399,65 @@ function setupRealtimeListener() {
 
     console.log('[setupRealtimeListener] Configurando listener para:', activeTripData.id);
 
+    let latestTripDocData = activeTripData;
+    let latestRouteDocData = null;
+
+    const applyLiveState = () => {
+        updateStatus(latestTripDocData.status);
+
+        const routeLiveActive = isRouteLiveTrackingActive(latestRouteDocData);
+        const routeBusLocation = extractRouteLiveLocation(latestRouteDocData);
+        const tripDriverLiveActive = isDriverLiveTrackingActive(latestTripDocData);
+        const tripBusLocation = extractBusLocation(latestTripDocData.busLocation);
+
+        const shouldUseRouteGps = routeLiveActive && routeBusLocation;
+        const driverLiveActive = Boolean(shouldUseRouteGps || (tripDriverLiveActive && tripBusLocation));
+        const normalizedBusLocation = shouldUseRouteGps ? routeBusLocation : tripBusLocation;
+
+        if (driverLiveActive) {
+            if (!isUsingDriverLiveLocation) {
+                console.log('[Listener] GPS real do motorista detectado. Desativando simulador local.');
+            }
+            isUsingDriverLiveLocation = true;
+            stopBusSimulator();
+        } else {
+            if (isUsingDriverLiveLocation) {
+                console.log('[Listener] GPS real inativo. Retornando para simulador.');
+            }
+            isUsingDriverLiveLocation = false;
+
+            if (!busSimulator || !busSimulator.isRunning) {
+                startBusSimulator();
+            }
+        }
+
+        updateGpsTelemetry(latestTripDocData, normalizedBusLocation, driverLiveActive);
+        if (normalizedBusLocation) {
+            updateBusMarker(normalizedBusLocation.lat, normalizedBusLocation.lon);
+
+            if (activeTripData.originCoords) {
+                updateDistanceAndETA(normalizedBusLocation);
+            }
+        }
+    };
+
+    if (routeUnsubscriber) {
+        routeUnsubscriber();
+        routeUnsubscriber = null;
+    }
+
+    const activeRouteId = String(activeTripData.routeId || '').trim();
+    if (activeRouteId) {
+        routeUnsubscriber = db.collection('routes')
+            .doc(activeRouteId)
+            .onSnapshot((doc) => {
+                latestRouteDocData = doc.exists ? (doc.data() || null) : null;
+                applyLiveState();
+            }, (error) => {
+                console.error('[Route Listener] Erro:', error);
+            });
+    }
+
     tripUnsubscriber = db.collection('active_trips')
         .doc(activeTripData.id)
         .onSnapshot((doc) => {
@@ -372,40 +471,8 @@ function setupRealtimeListener() {
 
             // Atualizar dados locais
             activeTripData = { id: doc.id, ...data };
-
-            // Atualizar status
-            updateStatus(data.status);
-
-            const driverLiveActive = isDriverLiveTrackingActive(data);
-
-            if (driverLiveActive) {
-                if (!isUsingDriverLiveLocation) {
-                    console.log('[Listener] GPS real do motorista detectado. Desativando simulador local.');
-                }
-                isUsingDriverLiveLocation = true;
-                stopBusSimulator();
-            } else {
-                if (isUsingDriverLiveLocation) {
-                    console.log('[Listener] GPS real inativo. Retornando para simulador.');
-                }
-                isUsingDriverLiveLocation = false;
-
-                if (!busSimulator || !busSimulator.isRunning) {
-                    startBusSimulator();
-                }
-            }
-
-            // Atualizar posição do ônibus
-            const normalizedBusLocation = extractBusLocation(data.busLocation);
-            updateGpsTelemetry(data, normalizedBusLocation, driverLiveActive);
-            if (normalizedBusLocation) {
-                updateBusMarker(normalizedBusLocation.lat, normalizedBusLocation.lon);
-
-                // Calcular distância e ETA
-                if (activeTripData.originCoords) {
-                    updateDistanceAndETA(normalizedBusLocation);
-                }
-            }
+            latestTripDocData = activeTripData;
+            applyLiveState();
         }, (error) => {
             console.error('[Listener] Erro:', error);
         });
@@ -645,6 +712,10 @@ window.addEventListener('beforeunload', () => {
 
     if (tripUnsubscriber) {
         tripUnsubscriber();
+    }
+
+    if (routeUnsubscriber) {
+        routeUnsubscriber();
     }
 });
 

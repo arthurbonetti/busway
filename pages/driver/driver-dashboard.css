@@ -62,6 +62,34 @@ body {
     align-items: center;
     gap: 12px;
 }
+
+.trip-item.assigned-route-item {
+    border-style: dashed;
+    background: #f8fafc;
+}
+
+.assigned-route-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #1d4ed8;
+    background: #dbeafe;
+}
+
+.assigned-route-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.assigned-route-gps-btn {
+    white-space: nowrap;
+}
 .trip-title { font-weight: 700; }
 .trip-meta { color: #6b7280; font-size: 13px; margin-top: 4px; }
 .empty { color: #6b7280; }
@@ -91,4 +119,8 @@ body {
 @media (max-width: 860px) {
     .grid { grid-template-columns: 1fr; }
     .trip-item { flex-direction: column; align-items: flex-start; }
+    .assigned-route-actions {
+        width: 100%;
+        justify-content: flex-start;
+    }
 }

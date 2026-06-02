@@ -9,16 +9,13 @@
     <meta property="og:description" content="Acompanhe rotas em tempo real, pague com facilidade e tenha todo o histórico das suas viagens.">
     <meta property="og:type" content="website">
     <title>Busway - Seu transporte, simplificado</title>
+
     <link rel="manifest" href="manifest.json">
-<<<<<<< HEAD
     <link rel="stylesheet" href="styles/global/styles.css">
     <link rel="stylesheet" href="styles/global/ux-improvements.css">
-=======
     <link rel="stylesheet" href="pages/public/landing.css">
->>>>>>> c7f2aa5 (Reorganizando diretorios, melhorando fluxo, adicionando motoristas e localização inicial)
 </head>
 <body>
-    <!-- Navbar -->
     <header class="navbar" role="banner">
         <div class="navbar-container">
             <a href="index.html" class="navbar-brand" aria-label="Busway - Página inicial">
@@ -48,7 +45,6 @@
         </div>
     </header>
 
-    <!-- Mobile Nav Overlay -->
     <div class="mobile-nav" id="mobileNav" role="navigation" aria-label="Menu mobile">
         <a href="#promo">Vantagens</a>
         <a href="#how-it-works">Como Funciona</a>
@@ -57,7 +53,6 @@
     </div>
 
     <main>
-        <!-- Hero -->
         <section class="hero" id="hero">
             <div class="hero-split">
                 <div class="hero-content">
@@ -90,13 +85,6 @@
             </div>
         </section>
 
-<<<<<<< HEAD
-    <!-- Configuração e serviços -->
-    <script src="firebase-config.js"></script>
-    <script src="js/services/firestore-service.js"></script>
-    <script src="js/script.js"></script>
-=======
-        <!-- Promo Banner -->
         <section class="promo-banner" id="promo">
             <div class="promo-container">
                 <div class="promo-icon">
@@ -118,7 +106,6 @@
             </div>
         </section>
 
-        <!-- How it works -->
         <section class="how-it-works" id="how-it-works">
             <div class="section-container">
                 <div class="section-header">
@@ -146,7 +133,6 @@
             </div>
         </section>
 
-        <!-- Stats -->
         <section class="stats">
             <div class="stats-grid">
                 <div>
@@ -158,89 +144,35 @@
                     <div class="stat-label">Usuários ativos</div>
                 </div>
                 <div>
-                    <div class="stat-number">100+</div>
-                    <div class="stat-label">Viagens realizadas</div>
+                    <div class="stat-number">3</div>
+                    <div class="stat-label">Cidades atendidas</div>
+                </div>
+                <div>
+                    <div class="stat-number">24/7</div>
+                    <div class="stat-label">Monitoramento</div>
                 </div>
             </div>
         </section>
 
-        <!-- CTA Final -->
         <section class="cta-section">
-            <h2>Pronto para simplificar suas viagens?</h2>
-            <p>Junte-se aos usuários que já utilizam o Busway no dia a dia.</p>
-            <a href="login.html" class="btn-primary">
-                Criar conta gratuita
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <line x1="5" y1="12" x2="19" y2="12"/>
-                    <polyline points="12 5 19 12 12 19"/>
-                </svg>
-            </a>
+            <div class="cta-box">
+                <h2>Pronto para começar?</h2>
+                <p>Crie sua conta em poucos segundos e acompanhe o transporte da sua cidade com mais praticidade.</p>
+                <a href="login.html" class="btn-primary">Criar minha conta</a>
+            </div>
         </section>
     </main>
 
-    <!-- Footer -->
-    <footer class="footer" role="contentinfo">
-        <div class="footer-container">
-            <div class="footer-brand">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                    <path d="M4 16c0 .88.39 1.67 1 2.22V20a1 1 0 001 1h1a1 1 0 001-1v-1h8v1a1 1 0 001 1h1a1 1 0 001-1v-1.78c.61-.55 1-1.34 1-2.22V6c0-3.5-3.58-4-8-4s-8 .5-8 4v10zm3.5 1c-.83 0-1.5-.67-1.5-1.5S6.67 14 7.5 14s1.5.67 1.5 1.5S8.33 17 7.5 17zm9 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm1.5-6H6V6h12v5z" fill="#667eea"/>
-                </svg>
-                <div>
-                    <span class="footer-logo">Busway</span>
-                    <span class="footer-tagline"> — Seu transporte, simplificado</span>
-                </div>
-            </div>
-            <span class="footer-copyright">&copy; 2026 Busway. Todos os direitos reservados.</span>
-        </div>
-    </footer>
+    <div class="notification" id="notification"></div>
 
-    <!-- Mobile nav toggle + Carousel -->
-    <script>
-        // Mobile nav
-        var toggle = document.getElementById('navToggle');
-        var nav = document.getElementById('mobileNav');
-        toggle.addEventListener('click', function() {
-            var open = nav.classList.toggle('active');
-            toggle.setAttribute('aria-expanded', open);
-        });
-        nav.addEventListener('click', function(e) {
-            if (e.target.tagName === 'A') { nav.classList.remove('active'); toggle.setAttribute('aria-expanded', 'false'); }
-        });
+    <script src="js/script.js"></script>
 
-        // Carousel
-        (function() {
-            var imgs = document.querySelectorAll('.carousel-img');
-            var dots = document.querySelectorAll('.dot');
-            var current = 0;
-            var total = imgs.length;
-
-            function show(index) {
-                imgs[current].classList.remove('active');
-                dots[current].classList.remove('active');
-                current = index;
-                imgs[current].classList.add('active');
-                dots[current].classList.add('active');
-            }
-
-            dots.forEach(function(dot) {
-                dot.addEventListener('click', function() {
-                    show(parseInt(this.dataset.index));
-                });
-            });
-
-            setInterval(function() {
-                show((current + 1) % total);
-            }, 4000);
-        })();
-    </script>
->>>>>>> c7f2aa5 (Reorganizando diretorios, melhorando fluxo, adicionando motoristas e localização inicial)
-
-    <!-- PWA Service Worker -->
     <script>
         if ('serviceWorker' in navigator) {
-            window.addEventListener('load', function() {
+            window.addEventListener('load', () => {
                 navigator.serviceWorker.register('/service-worker.js')
                     .then((registration) => {
+                        console.log('[PWA] Service Worker registrado:', registration.scope);
                         registration.update();
 
                         if (registration.waiting) {
