@@ -115,9 +115,8 @@ Observacao: revise o `start_url` e caminhos de atalhos no manifest para garantir
 ## Autores
 
 - Arthur Bonetti
-- Joao Pedro Vogel Costa
 - Murilo Schneider
 - Matheus Valdameri Bichara
-- Pedro Eduardo Sansigolo
+- Pedro Henrique Gasparetto
 
 
